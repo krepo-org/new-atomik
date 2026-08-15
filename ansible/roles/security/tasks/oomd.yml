@@ -8,6 +8,44 @@
     masked: false
   failed_when: false
 
+- name: Create OOMD config directory
+  ansible.builtin.file:
+    path: /etc/systemd/oomd.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create user slice config directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/user-.slice.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create protected service dropin directories
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}.service.d"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: "{{ atomik_oomd_protected_services[atomik_variant] | default([]) }}"
+  loop_control:
+    label: "{{ item }}"
+
+- name: Create desktop scheduler service dropin directories
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}.service.d"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: "{{ atomik_desktop_scheduler_services[atomik_variant] | default([]) }}"
+  loop_control:
+    label: "{{ item }}"
+
 - name: Deploy OOMD config
   ansible.builtin.copy:
     content: "{{ atomik_oomd_config }}"

@@ -14,6 +14,14 @@
     group: root
     mode: "0644"
 
+- name: Ensure user containers config directory exists
+  ansible.builtin.file:
+    path: "{{ _podman_user_config }}"
+    state: directory
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0700"
+
 - name: Deploy user containers.conf
   ansible.builtin.template:
     src: containers-user.conf.j2

@@ -1,5 +1,16 @@
 ---
 
+- name: Create desktop scheduler dropin directories
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}.service.d"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: "{{ atomik_desktop_scheduler_services[atomik_variant] | default([]) }}"
+  loop_control:
+    label: "{{ item }}"
+
 - name: Create desktop scheduler dropins
   ansible.builtin.template:
     src: desktop_scheduler.service.d.j2
