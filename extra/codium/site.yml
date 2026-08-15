@@ -8,6 +8,48 @@
     codium_install_dir: "/var/home/{{ ansible_user_id }}/.local/share/codium"
     codium_config_dir: "/var/home/{{ ansible_user_id }}/.config/VSCodium"
     codium_extensions_dir: "/var/home/{{ ansible_user_id }}/.vscode-oss/extensions"
+    codium_openvsx_extensions:
+      - charliermarsh.ruff
+      - tamasfe.even-better-toml
+      - usernamehw.errorlens
+      - christian-kohler.path-intellisense
+      - mhutchie.git-graph
+      - Gruntfuggly.todo-tree
+      - humao.rest-client
+      - ms-vscode.makefile-tools
+      - esbenp.prettier-vscode
+      - dbaeumer.vscode-eslint
+      - bradlc.vscode-tailwindcss
+      - formulahendry.auto-rename-tag
+      - formulahendry.auto-close-tag
+      - golang.go
+      - rust-lang.rust-analyzer
+      - fwcd.kotlin
+      - foxundermoon.shell-format
+      - timonwong.shellcheck
+      - redhat.ansible
+      - redhat.vscode-yaml
+      - redhat.vscode-xml
+      - ms-azuretools.vscode-docker
+      - ms-vscode.powershell
+      - ms-vscode.hexeditor
+      - zhuangtongfa.material-theme
+      - dracula-theme.theme-dracula
+      - github.github-vscode-theme
+      - PKief.material-icon-theme
+      - catppuccin.catppuccin-vsc-icons
+    codium_microsoft_extensions:
+      - ms-python.python
+      - ms-python.debugpy
+      - ms-python.vscode-pylance
+      - ms-python.vscode-python-envs
+      - ms-python.mypy-type-checker
+      - ms-azuretools.vscode-containers
+      - ms-vscode.cmake-tools
+      - ms-vscode.cpptools
+      - redhat.java
+      - ms-vscode.vscode-typescript-next
+      - davidanson.vscode-markdownlint
 
   tasks:
     - name: Skip in containers
@@ -85,36 +127,7 @@
         ELECTRON_RUN_AS_NODE=1 {{ codium_install_dir }}/codium \
           {{ codium_install_dir }}/resources/app/out/cli.js \
           --install-extension {{ item }} 2>&1 | tail -1
-      loop:
-        - eamodio.gitlens
-        - charliermarsh.ruff
-        - tamasfe.even-better-toml
-        - bradlc.vscode-tailwindcss
-        - usernamehw.errorlens
-        - christian-kohler.path-intellisense
-        - formulahendry.auto-rename-tag
-        - formulahendry.auto-close-tag
-        - mhutchie.git-graph
-        - gruntfuggly.todo-tree
-        - humao.rest-client
-        - ms-vscode.makefile-tools
-        - dbaeumer.vscode-eslint
-        - esbenp.prettier-vscode
-        - golang.go
-        - rust-lang.rust-analyzer
-        - redhat.ansible
-        - redhat.vscode-yaml
-        - redhat.java
-        - redhat.vscode-xml
-        - ms-azuretools.vscode-docker
-        - ms-vscode.powershell
-        - ms-python.python
-        - ms-python.debugpy
-        - ms-python.mypy-type-checker
-        - ms-vscode.cpptools
-        - ms-vscode.cmake-tools
-        - ms-vscode.hexeditor
-        - ms-vscode.vscode-typescript-next
+      loop: "{{ codium_openvsx_extensions }}"
       loop_control:
         label: "{{ item }}"
       register: ext_install
@@ -135,9 +148,7 @@
           {{ codium_install_dir }}/resources/app/out/cli.js \
           --install-extension /tmp/ext.vsix 2>&1 | tail -1
         rm -f /tmp/ext.vsix /tmp/ext.vsix.gz
-      loop:
-        - ms-dotnettools.csharp
-        - ms-dotnettools.csdevkit
+      loop: "{{ codium_microsoft_extensions }}"
       loop_control:
         label: "{{ item }}"
       register: ms_ext_install
