@@ -1,0 +1,52 @@
+---
+- name: Setup Flatpak environment
+  hosts: localhost
+  become: true
+  gather_facts: true
+
+  vars:
+    flatpak_remotes:
+      - name: flathub
+        url: https://dl.flathub.org/repo/flathub.flatpakrepo
+        state: present
+
+  tasks:
+    - name: Skip in containers
+      when: >
+        ansible_facts.get('virtualization_type', '') == 'container' or
+        ansible_facts.get('file', {}).get('/run/.toolboxenv', {}).get('exists', false)
+      block:
+        - name: Skip message
+          ansible.builtin.debug:
+            msg: "Skipping flatpak setup in container environment"
+        - name: End play
+          ansible.builtin.meta: end_play
+
+    - name: Ensure flatpak is installed
+      ansible.builtin.shell: |
+        rpm-ostree install -y --idempotent --allow-inactive flatpak || true
+      register: flatpak_install
+      changed_when: "'Queued' in flatpak_install.stdout"
+      failed_when: false
+
+    - name: Apply live changes if needed
+      ansible.builtin.shell: rpm-ostree apply-live --allow-replacement
+      register: apply_flatpak
+      changed_when: apply_flatpak.rc == 0
+      failed_when: false
+      when: flatpak_install.changed
+
+    - name: Ensure Flatpak remotes
+      community.general.flatpak_remote:
+        name: "{{ item.name }}"
+        url: "{{ item.url }}"
+        state: "{{ item.state }}"
+        method: user
+      loop: "{{ flatpak_remotes }}"
+      loop_control:
+        label: "{{ item.name }}"
+      become: true
+      become_user: "{{ ansible_user_id }}"
+      register: remote_result
+      changed_when: remote_result is changed
+      failed_when: false
