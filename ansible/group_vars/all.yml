@@ -842,25 +842,21 @@ atomik_gnome_dconf:
     value: "true"
   - path: /org/gnome/desktop/lockdown/disable-command-line
     value: "false"
-  - path: /org/gnome/desktop/interface/icon-theme
-    value: "'Tela-circle-nord-dark'"
-  - path: /org/gnome/desktop/interface/cursor-theme
-    value: "'Nordic-cursors'"
 
 atomik_kde_settings:
   animations:
     - file: kdeglobals
       group: KDE
       key: AnimationDurationFactor
-      value: "0"
+      value: "0.5"
     - file: kwinrc
       group: kwin
       key: Opacity
-      value: "0"
+      value: ""
     - file: kwinrc
       group: Blur
       key: Blur
-      value: "false"
+      value: ""
     - file: kwinrc
       group: Compositing
       key: OpenGLIsUnsafe
@@ -936,59 +932,199 @@ atomik_kde_settings:
       group: Compositing
       key: Enabled
       value: "true"
-  window_decorations:
-    - file: kwinrc
-      group: org.kde.kdecoration2
-      key: library
-      value: org.kde.kwin.aurorae
-    - file: kwinrc
-      group: org.kde.kdecoration2
-      key: theme
-      value: __aurorae__svg__Nordic
-    - file: kwinrc
-      group: org.kde.kdecoration2
-      key: BorderSize
-      value: Tiny
-    - file: kwinrc
-      group: org.kde.kdecoration2
-      key: CustomButtonPositions
-      value: "true"
-    - file: kwinrc
-      group: org.kde.kdecoration2
-      key: LeftButtons
-      value: ""
-    - file: kwinrc
-      group: org.kde.kdecoration2
-      key: RightButtons
-      value: M,S,C
   notifications:
-    - file: knotifyrc
-      group: General
-      key: widgetStyle
-      value: Kvantum
     - file: kdeglobals
       group: Sounds
       key: Enabled
       value: "false"
-  gtk:
-    - file: kdeglobals
-      group: KDE
-      key: widgetStyle
-      value: Kvantum
+  effects:
+    - file: kwinrc
+      group: Plugins
+      key: blurEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: cubeEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: diminactiveEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: fadeEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: fallapartEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: fullscreenEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: glideEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: loginEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: logoutEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: magiclampEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: maximizeEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: overviewEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: scaleEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: sheetEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: slideEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: slidebackEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: slidingnotificationsEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: slidingpopupsEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: squashEnabled
+      value: "true"
+    - file: kwinrc
+      group: Plugins
+      key: wobblywindowsEnabled
+      value: "true"
+  kded:
+    - file: kded6rc
+      group: Module-browserintegrationflatpakintegrator
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-browserintegrationreminder
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-device_automounter
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-dnssdwatcher
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-donationmessage
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-freespacenotifier
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-geotimezoned
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-kded_bolt
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-kded_plasma_welcome
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-kwrited
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-lookandfeelautoswitcher
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-oom_notifier
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-remotenotifier
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-smart
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-smbwatcher
+      key: autoload
+      value: "false"
+    - file: kded6rc
+      group: Module-wpad-detector
+      key: autoload
+      value: "false"
+  lock:
+    - file: kscreenlockerrc
+      group: Daemon
+      key: Autolock
+      value: "false"
+    - file: kscreenlockerrc
+      group: Daemon
+      key: LockOnResume
+      value: "false"
+  screen_edges:
+    - file: kwinrc
+      group: ScreenEdges
+      key: RemainActiveOnFullscreen
+      value: "true"
 
-atomik_kde_theme:
-  silverblue: {}
-  kinoite:
-    theme: Nordic
-    colorscheme: Nordic
-    font: Cantarell 11
-    monospace_font: Noto Sans Mono 11
-    icon_theme: Tela-circle-nord-dark
-    cursor_theme: Nordic-cursors
-    window_deco: __aurorae__svg__Nordic
-    border_size: Tiny
-    widget_style: Kvantum
-  cosmic-atomic: {}
+atomik_kde_disabled_autostart:
+  - baloo_file.desktop
+  - geoclue-demo-agent.desktop
+  - gmenudbusmenuproxy.desktop
+  - org.kde.discover.notifier.desktop
+  - org.kde.kdeconnect.daemon.desktop
+  - org.kde.kunifiedpush-distributor.desktop
+  - org.kde.xwaylandvideobridge.desktop
+  - pam_kwallet_init.desktop
+  - xembedsniproxy.desktop
+
+atomik_kde_powerdevil: |
+  [AC][Display]
+  DimDisplayWhenIdle=false
+  TurnOffDisplayWhenIdle=false
+  LockBeforeTurnOffDisplay=false
+
+  [AC][SuspendAndShutdown]
+  AutoSuspendIdleTimeoutSec=0
+
+  [Battery][Display]
+  DimDisplayWhenIdle=false
+  TurnOffDisplayWhenIdle=false
+  LockBeforeTurnOffDisplay=false
+
+  [Battery][SuspendAndShutdown]
+  AutoSuspendIdleTimeoutSec=0
 
 atomik_kde_config_files:
   - kdeglobals
@@ -1005,33 +1141,20 @@ atomik_kde_config_files:
 
 atomik_ego_extensions:
   - dash-to-dock@micxgx.gmail.com
-  - user-theme@gnome-shell-extensions.gcampax.github.com
 atomik_ego_base_url: "https://extensions.gnome.org"
 atomik_ego_install_dir: "/home/{{ atomik_user }}/.local/share/gnome-shell/extensions"
 
 atomik_gnome_dconf_full:
   - path: /org/gnome/desktop/interface/enable-animations
     value: "false"
-  - path: /org/gnome/desktop/interface/icon-theme
-    value: "'Tela-circle-nord-dark'"
-  - path: /org/gnome/desktop/interface/cursor-theme
-    value: "'Nordic-cursors'"
-  - path: /org/gnome/desktop/interface/gtk-theme
-    value: "'Nordic'"
   - path: /org/gnome/desktop/interface/font-name
     value: "'Cantarell 11'"
   - path: /org/gnome/desktop/interface/document-font-name
     value: "'Cantarell 11'"
   - path: /org/gnome/desktop/interface/monospace-font-name
     value: "'Noto Sans Mono 11'"
-  - path: /org/gnome/desktop/wm/preferences/theme
-    value: "'Nordic'"
   - path: /org/gnome/desktop/wm/preferences/button-layout
     value: "':minimize,maximize,close'"
-  - path: /org/gnome/desktop/shell/extensions/user-theme/name
-    value: "'Nordic'"
-  - path: /org/gnome/desktop/interface/color-scheme
-    value: "'prefer-dark'"
   - path: /org/gnome/desktop/interface/show-battery-percentage
     value: "true"
   - path: /org/gnome/desktop/interface/clock-show-weekday
@@ -1058,12 +1181,6 @@ atomik_gnome_dconf_full:
     value: "true"
   - path: /org/gnome/desktop/peripherals/mouse/natural-scroll
     value: "true"
-  - path: /org/gnome/desktop/background/picture-uri-dark
-    value: "''"
-  - path: /org/gnome/desktop/background/color-shading-type
-    value: "'solid'"
-  - path: /org/gnome/desktop/background/primary-color
-    value: "'#2e3440'"
   - path: /org/gnome/shell/overrides/attach-modal-dialogs
     value: "false"
   - path: /org/gnome/shell/overrides/workspaces-only-on-primary
@@ -1134,21 +1251,3 @@ atomik_gnome_environment: |
   CLUTTER_BACKEND=wayland
   CLUTTER_SHOW_FPS=0
   __GL_MaxFramesAllowed=1
-
-atomik_nordic_palette:
-  nord0: "#2e3440"
-  nord1: "#3b4252"
-  nord2: "#434c5e"
-  nord3: "#4c566a"
-  nord4: "#d8dee9"
-  nord5: "#e5e9f0"
-  nord6: "#eceff4"
-  nord7: "#8fbcbb"
-  nord8: "#88c0d0"
-  nord9: "#81a1c1"
-  nord10: "#5e81ac"
-  nord11: "#bf616a"
-  nord12: "#d08770"
-  nord13: "#ebcb8b"
-  nord14: "#a3be8c"
-  nord15: "#b48ead"

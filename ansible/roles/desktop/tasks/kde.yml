@@ -19,7 +19,7 @@
 
 - name: Apply KDE settings
   ansible.builtin.shell: |
-    {{ kde_config_tool }} --file {{ item.file }} --group {{ item.group }} --key {{ item.key }} {{ item.value | default('') }}
+    {{ kde_config_tool }} --file {{ item.file }} --group {{ item.group }} --key {{ item.key }} '{{ item.value | default('') }}'
   become: true
   become_user: "{{ atomik_user }}"
   loop: >-
@@ -31,12 +31,46 @@
        atomik_kde_settings.wallet | default([]) +
        atomik_kde_settings.restrictions | default([]) +
        atomik_kde_settings.compositor | default([]) +
-       atomik_kde_settings.window_decorations | default([]) +
        atomik_kde_settings.notifications | default([]) +
-       atomik_kde_settings.gtk | default([]) }}
+       atomik_kde_settings.effects | default([]) +
+       atomik_kde_settings.kded | default([]) +
+       atomik_kde_settings.lock | default([]) +
+       atomik_kde_settings.screen_edges | default([]) }}
   loop_control:
     label: "{{ item.file }}/{{ item.group }}/{{ item.key }}"
   when: item.value is defined and kde_config_tool != 'none'
+
+- name: Deploy KDE power profiles
+  ansible.builtin.copy:
+    content: "{{ atomik_kde_powerdevil }}"
+    dest: "/home/{{ atomik_user }}/.config/powerdevilrc"
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0644"
+  become: true
+
+- name: Disable unwanted KDE autostart entries
+  ansible.builtin.copy:
+    content: |
+      [Desktop Entry]
+      Hidden=true
+    dest: "/home/{{ atomik_user }}/.config/autostart/{{ item }}"
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0644"
+  loop: "{{ atomik_kde_disabled_autostart | default([]) }}"
+  loop_control:
+    label: "{{ item }}"
+  become: true
+
+- name: Create KDE environment config directory
+  ansible.builtin.file:
+    path: "/home/{{ atomik_user }}/.config/environment.d"
+    state: directory
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0755"
+  become: true
 
 - name: Deploy KDE environment config
   ansible.builtin.copy:
@@ -47,172 +81,22 @@
     mode: "0644"
   become: true
 
-- name: Deploy custom look-and-feel package
+- name: Deploy minimal look-and-feel package
   ansible.builtin.copy:
     src: look-and-feel/
-    dest: "/home/{{ atomik_user }}/.local/share/plasma/look-and-feel/com.atomik.desktop/"
+    dest: "/home/{{ atomik_user }}/.local/share/plasma/look-and-feel/"
     owner: "{{ atomik_user }}"
     group: "{{ atomik_user }}"
     mode: "0644"
   become: true
-  become_user: "{{ atomik_user }}"
 
-- name: Apply KDE theme settings
-  ansible.builtin.shell: |
-    {{ kde_config_tool }} --file kdeglobals --group General --key theme {{ atomik_kde_theme[atomik_variant].theme }}
-    {{ kde_config_tool }} --file kdeglobals --group General --key ColorScheme {{ atomik_kde_theme[atomik_variant].colorscheme }}
-    {{ kde_config_tool }} --file kdeglobals --group General --key font {{ atomik_kde_theme[atomik_variant].font }}
-    {{ kde_config_tool }} --file kdeglobals --group General --key fixed {{ atomik_kde_theme[atomik_variant].monospace_font }}
-    {{ kde_config_tool }} --file kdeglobals --group Icons --key IconTheme {{ atomik_kde_theme[atomik_variant].icon_theme }}
-    {{ kde_config_tool }} --file kdeglobals --group Icons --key cursorTheme {{ atomik_kde_theme[atomik_variant].cursor_theme }}
-    {{ kde_config_tool }} --file kdeglobals --group KDE --key LookAndFeelPackage com.atomik.desktop
-    {{ kde_config_tool }} --file kdeglobals --group KDE --key widgetStyle {{ atomik_kde_theme[atomik_variant].widget_style }}
-    {{ kde_config_tool }} --file ksplashrc --group KSplash --key Engine none
-    {{ kde_config_tool }} --file ksplashrc --group KSplash --key Theme none
+- name: Activate minimal look-and-feel
+  ansible.builtin.shell: lookandfeeltool --apply com.atomik.desktop
   become: true
   become_user: "{{ atomik_user }}"
-  when: atomik_kde_theme[atomik_variant] | length > 0 and kde_config_tool != 'none'
-
-- name: Create Konsole themes directory
-  ansible.builtin.file:
-    path: "/home/{{ atomik_user }}/.local/share/konsole"
-    state: directory
-    owner: "{{ atomik_user }}"
-    group: "{{ atomik_user }}"
-    mode: "0755"
-  become: true
-
-- name: Deploy Konsole Nordic color scheme
-  ansible.builtin.copy:
-    content: |
-      [Background]
-      Color=46,52,64
-      [BackgroundFaint]
-      Color=46,52,64
-      [BackgroundIntense]
-      Color=46,52,64
-      [Foreground]
-      Color=216,222,233
-      [ForegroundFaint]
-      Color=216,222,233
-      [ForegroundIntense]
-      Color=216,222,233
-      [General]
-      Description=Nordic
-      Opacity=0.95
-      Wallpaper=
-      [Color0]
-      Color=59,66,82
-      [Color0Faint]
-      Color=59,66,82
-      [Color0Intense]
-      Color=76,86,106
-      [Color1]
-      Color=191,97,106
-      [Color1Faint]
-      Color=191,97,106
-      [Color1Intense]
-      Color=191,97,106
-      [Color2]
-      Color=163,190,140
-      [Color2Faint]
-      Color=163,190,140
-      [Color2Intense]
-      Color=163,190,140
-      [Color3]
-      Color=235,203,139
-      [Color3Faint]
-      Color=235,203,139
-      [Color3Intense]
-      Color=235,203,139
-      [Color4]
-      Color=129,161,193
-      [Color4Faint]
-      Color=129,161,193
-      [Color4Intense]
-      Color=129,161,193
-      [Color5]
-      Color=180,142,173
-      [Color5Faint]
-      Color=180,142,173
-      [Color5Intense]
-      Color=180,142,173
-      [Color6]
-      Color=136,192,208
-      [Color6Faint]
-      Color=136,192,208
-      [Color6Intense]
-      Color=136,192,208
-      [Color7]
-      Color=229,229,229
-      [Color7Faint]
-      Color=229,229,229
-      [Color7Intense]
-      Color=255,255,255
-    dest: "/home/{{ atomik_user }}/.local/share/konsole/Nordic.colorscheme"
-    owner: "{{ atomik_user }}"
-    group: "{{ atomik_user }}"
-    mode: "0644"
-  become: true
-  become_user: "{{ atomik_user }}"
-
-- name: Deploy Konsole Nordic profile
-  ansible.builtin.copy:
-    content: |
-      [Appearance]
-      ColorScheme=Nordic
-      Font=Noto Sans Mono,11
-      [General]
-      Name=Nordic
-      Parent=FALLBACK/
-      TerminalCenter=false
-      TerminalRows=40
-      TerminalColumns=120
-      [Scrolling]
-      HistoryMode=2
-      HistorySize=10000
-      [TerminalFeatures]
-      BlinkingCursorEnabled=false
-    dest: "/home/{{ atomik_user }}/.local/share/konsole/Nordic.profile"
-    owner: "{{ atomik_user }}"
-    group: "{{ atomik_user }}"
-    mode: "0644"
-  become: true
-  become_user: "{{ atomik_user }}"
-
-- name: Set Konsole default profile
-  ansible.builtin.shell: |
-    {{ kde_config_tool }} --file konsolerc --group "Desktop Entry" --key DefaultProfile "Nordic.profile"
-  become: true
-  become_user: "{{ atomik_user }}"
-  when: kde_config_tool != 'none'
-
-- name: Deploy SDDM Nordic theme
-  ansible.builtin.shell: |
-    SDDM_THEME_DIR="/usr/share/sddm/themes/Nordic"
-    if [ ! -d "$SDDM_THEME_DIR" ]; then
-      TMPDIR=$(mktemp -d)
-      git clone --depth 1 https://github.com/EliverLara/Nordic-kDE.git "$TMPDIR/Nordic-kDE"
-      mkdir -p "/usr/share/sddm/themes"
-      cp -r "$TMPDIR/Nordic-kDE/sddm" "$SDDM_THEME_DIR"
-      rm -rf "$TMPDIR"
-    fi
-  become: true
-  changed_when: false
+  register: lnf_result
+  changed_when: lnf_result.rc == 0
   failed_when: false
-
-- name: Configure SDDM theme
-  ansible.builtin.copy:
-    content: |
-      [Theme]
-      Current=Nordic
-      CursorTheme=Nordic-cursors
-      Font=Cantarell,11
-    dest: /etc/sddm.conf.d/atomik-nordic.conf
-    owner: root
-    group: root
-    mode: "0644"
-  become: true
 
 - name: Deploy KDE panel setup script
   ansible.builtin.copy:
@@ -230,27 +114,6 @@
     sleep 1
     python3 /tmp/kde_panels.py
     systemctl --user start plasma-plasmashell
-    sleep 4
-    busctl --user call org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell evaluateScript s "
-    var ps = panels();
-    for (var i = 0; i < ps.length; i++) {
-        var p = ps[i];
-        if (p.location == 'bottom') {
-            p.hiding = 'autohide';
-            p.minimumLength = 0;
-            p.maximumLength = 0;
-            p.lengthMode = 'fit';
-            p.alignment = 'center';
-            p.offset = 24;
-        } else if (p.location == 'top') {
-            p.hiding = 'none';
-            p.lengthMode = 'fill';
-            p.alignment = 'center';
-            p.offset = 0;
-            p.immutability = 2;
-        }
-    }
-    "
   become: true
   become_user: "{{ atomik_user }}"
   register: panel_result
