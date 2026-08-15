@@ -71,6 +71,15 @@
     label: "{{ item }}"
   become: true
 
+- name: Mask crashing X11 legacy daemon user units
+  ansible.builtin.shell: |
+    systemctl --user mask plasma-kaccess.service
+    systemctl --user mask plasma-xembedsniproxy.service
+    systemctl --user mask plasma-gmenudbusmenuproxy.service
+  become: true
+  become_user: "{{ atomik_user }}"
+  changed_when: false
+
 - name: Create KDE environment config directory
   ansible.builtin.file:
     path: "/home/{{ atomik_user }}/.config/environment.d"

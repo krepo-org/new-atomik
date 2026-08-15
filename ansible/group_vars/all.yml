@@ -1222,16 +1222,8 @@ atomik_alsa_power_save: |
   options snd_hda_intel power_save_controller=N
 
 atomik_kde_environment: |
-  KWIN_DRM_BUFFER_COUNT=2
-  KWIN_DRM_DISABLE_TRIPLE_BUFFERING=1
   KWIN_WAYLAND_NO_SUSPEND=1
   KWIN_WAYLAND_SERVER_LOGGING=false
-  KWIN_DRM_SCHEDULER_ENABLED=1
-  KWIN_DRM_SCHEDULER_PRIORITY=realtime
-  KWIN_DRM_NO_AMS=1
-  KWIN_DRM_NO_AMS_FALLBACK=1
-  QT_QUICK_BACKEND=software
-  QT_AUTO_SCREEN_SCALE_FACTOR=0
 
 atomik_gnome_environment: |
   MUTTER_DEBUG_DISABLE_VBLANK=1
