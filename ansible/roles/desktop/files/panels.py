@@ -1,42 +1,35 @@
 import os, re
 
-appletsrc = os.path.expanduser("~/.config/plasma-org.kde.plasma.desktop-appletsrc")
-plasmashellrc = os.path.expanduser("~/.config/plasmashellrc")
+config_dir = os.path.expanduser("~/.config")
+appletsrc = os.path.join(config_dir, "plasma-org.kde.plasma.desktop-appletsrc")
+plasmashellrc = os.path.join(config_dir, "plasmashellrc")
 
-with open(appletsrc) as f:
-    lines = f.readlines()
 
-# Keep header (non-Containment lines) + screen mapping
-header = [l for l in lines if not l.startswith('[Containments]')]
-screendump = [l for l in lines if l.startswith('[ScreenMapping]')]
+def read_section(path, name):
+    if not os.path.exists(path):
+        return []
+    out = []
+    current = None
+    with open(path) as f:
+        for line in f:
+            line = line.rstrip("\n")
+            if line.startswith("[") and line.endswith("]"):
+                current = line
+            elif current == name and line.strip():
+                out.append(line)
+    return out
 
-# Top panel: simple clock only
-toppanel = """\
-[Containments][1]
-activityId=
-formfactor=2
-immutability=2
-lastScreen=0
-location=3
-plugin=org.kde.panel
-wallpaperplugin=org.kde.image
 
-[Containments][1][Applets][2]
-immutability=2
-plugin=org.kde.plasma.digitalclock
+def read_updates(path):
+    if not os.path.exists(path):
+        return ""
+    with open(path) as f:
+        content = f.read()
+    m = re.search(r"(\[Updates\].*)", content, re.DOTALL)
+    return m.group(1).rstrip("\n") if m else ""
 
-[Containments][1][Applets][2][Configuration][General]
-compactMode=true
-showDate=true
-showSeconds=false
-use24hFormat=true
 
-[Containments][1][General]
-AppletOrder=2
-
-"""
-
-# Bottom panel: kickoff + icontasks(pinned) + spacer + systemtray
+# Bottom panel: kicker + icontasks(pinned) + spacer + systemtray
 panel = """\
 [Containments][2]
 activityId=
@@ -152,40 +145,32 @@ AppletOrder=3;5;6;9
 
 """
 
-with open(appletsrc, 'w') as f:
-    f.writelines(header)
-    f.write('\n')
-    f.write(toppanel)
-    f.write('\n')
+screendump = read_section(appletsrc, "[ScreenMapping]")
+
+with open(appletsrc, "w") as f:
     f.write(panel)
-    f.write(''.join(screendump))
+    f.write("\n")
+    f.write("[ScreenMapping]\n")
+    f.write("\n".join(screendump) + "\n" if screendump else "")
 
+# Bottom panel: auto-hide (1), fit content (1), centered (4), floating (1)
 view = """\
-[PlasmaViews][Panel 1]
-floating=0
-opacity=1
-shell=org.kde.plasma.desktop
-
-[PlasmaViews][Panel 1][Defaults]
-thickness=32
-
 [PlasmaViews][Panel 2]
+alignment=4
 floating=1
 opacity=1
+panelLengthMode=1
+panelVisibility=1
 shell=org.kde.plasma.desktop
 
 [PlasmaViews][Panel 2][Defaults]
 thickness=44
 
 """
-try:
-    with open(plasmashellrc) as f:
-        old = f.read()
-    m = re.search(r'(\[Updates\].*)', old, re.DOTALL)
-    if m:
-        view += '\n' + m.group(1)
-except FileNotFoundError:
-    pass
 
-with open(plasmashellrc, 'w') as f:
+updates = read_updates(plasmashellrc)
+if updates:
+    view += "\n" + updates + "\n"
+
+with open(plasmashellrc, "w") as f:
     f.write(view)
