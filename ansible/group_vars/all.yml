@@ -189,6 +189,8 @@ atomik_variant_remove:
     - elisa
     - fedora-workstation-backgrounds
     - filelight
+    - gdb
+    - gdb-headless
     - gnome-backgrounds
     - gwenview
     - juk
@@ -280,6 +282,7 @@ atomik_variant_remove:
     - plasma-disks
     - plasma-drkonqi
     - plasma-welcome
+    - plasma-welcome-fedora
     - print-manager
     - rocs
     - step
@@ -287,29 +290,27 @@ atomik_variant_remove:
     - kde-spectacle
     - kde-gtk-config
     - khotkeys
-    - kmenuedit
     - krunner
     - kscreen
     - kscreen-doctor
     - ksshaskpass
     - ksystemstats
+    - plasma-systemmonitor
     - kwin-x11
     - oxygen-sounds
     - sddm-kcm
     - plasma-nano
     - plasma-mobile
     - plasma-browser-integration
+    - fedora-chromium-config-kde
     - plasma-discover-offline-updates
     - plasma-vault
     - plasma-workspace-wallpapers
     - plasma5-integration
     - colord-kde
     - drkonqi
-    - kde-cli-tools
-    - kio-extras
     - packagekit
     - packagekit-command-line
-    - xdg-desktop-portal-kde
   cosmic-atomic:
     - adwaita-qt5
     - adwaita-qt6
@@ -496,8 +497,6 @@ atomik_rpm_install:
 atomik_rpm_remove:
   - firefox
   - firefox-langpacks
-  - google-noto-sans-cjk-vf-fonts
-  - google-noto-color-emoji-fonts
   - google-noto-emoji-fonts
   - default-fonts-core-emoji
   - libreoffice-core
@@ -527,13 +526,6 @@ atomik_repositories:
       enabled=1
       gpgcheck=1
       gpgkey=https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-
-atomik_nix_packages:
-  - discord
-  - easyeffects
-  - obs-studio
-  - slack
-  - vlc
 
 atomik_firewall_services:
   - ssh
@@ -1097,6 +1089,13 @@ atomik_kde_disabled_autostart:
   - pam_kwallet_init.desktop
   - xembedsniproxy.desktop
 
+atomik_hidden_look_and_feel_themes:
+  - org.fedoraproject.fedora.desktop
+  - org.fedoraproject.fedoradark.desktop
+  - org.fedoraproject.fedoralight.desktop
+  - org.kde.breezedark.desktop
+  - org.kde.breezetwilight.desktop
+
 atomik_kde_powerdevil: |
   [AC][Display]
   DimDisplayWhenIdle=false
@@ -1189,13 +1188,27 @@ atomik_gnome_dconf_full:
     value: "false"
 
 atomik_critical_services:
-  - NetworkManager
-  - systemd-resolved
-  - upower
-  - bluetooth
-  - sshd
-  - gdm
-  - sddm
+  silverblue:
+    - NetworkManager
+    - systemd-resolved
+    - upower
+    - bluetooth
+    - sshd
+    - gdm
+  kinoite:
+    - NetworkManager
+    - systemd-resolved
+    - upower
+    - bluetooth
+    - sshd
+    - plasmalogin
+  cosmic-atomic:
+    - NetworkManager
+    - systemd-resolved
+    - upower
+    - bluetooth
+    - sshd
+    - cosmic-greeter
 
 atomik_masked_services:
   - abrtd

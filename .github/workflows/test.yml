@@ -113,16 +113,6 @@ jobs:
           count=$(find ansible/roles -path '*/handlers/main.yml' | wc -l)
           test "$count" -ge 2 || exit 1
 
-      - name: Log nix configuration validation
-        run: |
-          python3 -c "
-          import os
-          nix_dir = 'extra/nix'
-          assert os.path.exists(f'{nix_dir}/apply_nix.py'), 'apply_nix.py missing'
-          assert os.path.exists(f'{nix_dir}/site.yml'), 'site.yml missing'
-          print('Nix extra module valid')
-          "
-
       - name: Log sysctl configuration validation
         run: |
           /tmp/atomik-venv/bin/python3 -c "

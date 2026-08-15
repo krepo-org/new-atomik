@@ -167,21 +167,6 @@
           - security_tasks.files | length >= 10
         fail_msg: "Expected at least 10 security tasks, found {{ security_tasks.files | length }}"
 
-    - name: Test nix config parsing
-      ansible.builtin.set_fact:
-        test_nix:
-          packages:
-            - discord
-            - easyeffects
-            - obs-studio
-            - slack
-            - vlc
-
-    - name: Assert nix config valid
-      ansible.builtin.assert:
-        that:
-          - test_nix.packages | length >= 5
-
     - name: Test sysctl config parsing
       ansible.builtin.set_fact:
         test_sysctl:
