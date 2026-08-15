@@ -40,6 +40,14 @@
     label: "{{ item.file }}/{{ item.group }}/{{ item.key }}"
   when: item.value is defined and kde_config_tool != 'none'
 
+- name: Remove obsolete KDE animation keys
+  ansible.builtin.shell: |
+    {{ kde_config_tool }} --file kwinrc --group kwin --key Opacity --delete
+    {{ kde_config_tool }} --file kwinrc --group Blur --key Blur --delete
+  become: true
+  become_user: "{{ atomik_user }}"
+  when: kde_config_tool != 'none'
+
 - name: Deploy KDE power profiles
   ansible.builtin.copy:
     content: "{{ atomik_kde_powerdevil }}"

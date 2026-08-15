@@ -850,14 +850,6 @@ atomik_kde_settings:
       key: AnimationDurationFactor
       value: "0.5"
     - file: kwinrc
-      group: kwin
-      key: Opacity
-      value: ""
-    - file: kwinrc
-      group: Blur
-      key: Blur
-      value: ""
-    - file: kwinrc
       group: Compositing
       key: OpenGLIsUnsafe
       value: "true"
