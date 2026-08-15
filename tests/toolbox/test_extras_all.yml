@@ -8,11 +8,9 @@
     expected_extras:
       - business
       - codium
-      - debloat
       - flatpak
       - gaming
       - gnome
-      - kde
       - packages
 
   tasks:
@@ -46,28 +44,6 @@
         that:
           - extra_ymls.files | length >= 4
         fail_msg: "Expected at least 4 extra YAML files"
-
-    - name: Verify Python scripts in extra
-      ansible.builtin.find:
-        paths: "{{ playbook_dir }}/../../extra"
-        patterns: "*.py"
-        recurse: true
-      register: extra_py
-
-    - name: Count extra Python scripts
-      ansible.builtin.debug:
-        msg: "Found {{ extra_py.files | length }} Python scripts in extra/"
-
-    - name: Verify JavaScript files in extra
-      ansible.builtin.find:
-        paths: "{{ playbook_dir }}/../../extra"
-        patterns: "*.js"
-        recurse: true
-      register: extra_js
-
-    - name: Count extra JavaScript files
-      ansible.builtin.debug:
-        msg: "Found {{ extra_js.files | length }} JavaScript files in extra/"
 
     - name: All extra module tests passed
       ansible.builtin.debug:

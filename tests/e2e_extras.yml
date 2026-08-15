@@ -27,16 +27,6 @@
         that:
           - business_check.stat.exists
 
-    - name: Verify nix module structure
-      ansible.builtin.stat:
-        path: "{{ project_root }}/extra/nix/site.yml"
-      register: nix_check
-
-    - name: Assert nix module present
-      ansible.builtin.assert:
-        that:
-          - nix_check.stat.exists
-
     - name: Verify codium module structure
       ansible.builtin.stat:
         path: "{{ project_root }}/extra/codium/site.yml"
@@ -46,16 +36,6 @@
       ansible.builtin.assert:
         that:
           - codium_check.stat.exists
-
-    - name: Verify debloat module structure
-      ansible.builtin.stat:
-        path: "{{ project_root }}/extra/debloat/site.yml"
-      register: debloat_check
-
-    - name: Assert debloat module present
-      ansible.builtin.assert:
-        that:
-          - debloat_check.stat.exists
 
     - name: Verify packages module structure
       ansible.builtin.stat:
@@ -77,21 +57,8 @@
     - name: Assert Python scripts present
       ansible.builtin.assert:
         that:
-          - py_scripts.files | length >= 3
-        fail_msg: "Expected at least 3 Python scripts, found {{ py_scripts.files | length }}"
-
-    - name: Verify JavaScript files exist
-      ansible.builtin.find:
-        paths: "{{ project_root }}/extra"
-        patterns: "*.js"
-        recurse: true
-      register: js_files
-
-    - name: Assert JavaScript files present
-      ansible.builtin.assert:
-        that:
-          - js_files.files | length >= 2
-        fail_msg: "Expected at least 2 JavaScript files, found {{ js_files.files | length }}"
+          - py_scripts.files | length == 0
+        fail_msg: "Expected 0 Python scripts in extra/, found {{ py_scripts.files | length }}"
 
     - name: Verify SVG assets exist
       ansible.builtin.find:
@@ -103,48 +70,34 @@
     - name: Assert SVG assets present
       ansible.builtin.assert:
         that:
-          - svg_files.files | length >= 1
-        fail_msg: "Expected at least 1 SVG file, found {{ svg_files.files | length }}"
+          - svg_files.files | length == 0
+        fail_msg: "Expected 0 SVG files in extra/, found {{ svg_files.files | length }}"
 
     - name: Test gaming module variables
       ansible.builtin.set_fact:
         test_gaming:
-          nix_packages:
-            - discord
-            - heroic
+          flatpaks:
+            - com.discordapp.Discord
+            - com.heroicgameslauncher.hgl
 
     - name: Assert gaming variables valid
       ansible.builtin.assert:
         that:
-          - test_gaming.nix_packages | length == 2
-          - "'discord' in test_gaming.nix_packages"
-          - "'heroic' in test_gaming.nix_packages"
+          - test_gaming.flatpaks | length == 2
+          - "'com.discordapp.Discord' in test_gaming.flatpaks"
+          - "'com.heroicgameslauncher.hgl' in test_gaming.flatpaks"
 
     - name: Test business module variables
       ansible.builtin.set_fact:
         test_business:
-          nix_packages:
-            - slack
+          flatpaks:
+            - com.slack.Slack
 
     - name: Assert business variables valid
       ansible.builtin.assert:
         that:
-          - test_business.nix_packages | length == 1
-          - "'slack' in test_business.nix_packages"
-
-    - name: Test debloat module variables
-      ansible.builtin.set_fact:
-        test_debloat:
-          packages:
-            - firefox
-            - firefox-langpacks
-            - libreoffice-core
-
-    - name: Assert debloat variables valid
-      ansible.builtin.assert:
-        that:
-          - test_debloat.packages | length >= 3
-          - "'firefox' in test_debloat.packages"
+          - test_business.flatpaks | length == 1
+          - "'com.slack.Slack' in test_business.flatpaks"
 
     - name: Test packages module variables
       ansible.builtin.set_fact:

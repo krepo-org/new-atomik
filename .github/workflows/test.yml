@@ -197,7 +197,7 @@ jobs:
         run: |
           python3 -c "
           import os
-          extras = ['business', 'codium', 'debloat', 'devtools', 'gaming', 'gnome', 'nix', 'packages']
+          extras = ['business', 'codium', 'devtools', 'gaming', 'gnome', 'packages', 'flatpak']
           errors = []
           for ext in extras:
               ext_dir = f'extra/{ext}'
@@ -224,9 +224,10 @@ jobs:
           import yaml
           with open('extra/gaming/site.yml') as f:
               cfg = yaml.safe_load(f)
-          pkgs = cfg[0]['vars']['gaming_nix_packages']
-          assert 'discord' in pkgs, 'Discord missing'
-          print(f'Gaming: {len(pkgs)} Nix packages configured')
+          pkgs = cfg[0]['vars'].get('gaming_flatpaks', [])
+          assert 'com.discordapp.Discord' in pkgs, 'Discord missing'
+          assert 'com.heroicgameslauncher.hgl' in pkgs, 'Heroic missing'
+          print(f'Gaming: {len(pkgs)} Flatpak apps configured')
           "
 
       - name: Log business module validation
@@ -235,21 +236,17 @@ jobs:
           import yaml
           with open('extra/business/site.yml') as f:
               cfg = yaml.safe_load(f)
-          pkgs = cfg[0]['vars']['business_nix_packages']
-          assert 'slack' in pkgs, 'Slack missing'
-          print(f'Business: {len(pkgs)} Nix packages configured')
+          pkgs = cfg[0]['vars'].get('business_flatpaks', [])
+          assert 'com.slack.Slack' in pkgs, 'Slack missing'
+          print(f'Business: {len(pkgs)} Flatpak apps configured')
           "
 
-      - name: Log debloat module validation
+      - name: Log flatpak module validation
         run: |
           python3 -c "
-          import yaml
-          with open('extra/debloat/site.yml') as f:
-              cfg = yaml.safe_load(f)
-          packages = cfg[0]['vars']['atomik_rpm_remove']
-          assert 'firefox' in packages, 'firefox missing from debloat'
-          assert len(packages) >= 5, f'Expected at least 5 packages, got {len(packages)}'
-          print(f'Debloat: {len(packages)} packages to remove')
+          import os
+          assert os.path.exists('extra/flatpak/site.yml'), 'flatpak site.yml missing'
+          print('Flatpak extra module valid')
           "
 
       - name: Log packages module validation
@@ -262,6 +259,15 @@ jobs:
           assert 'brave-origin' in packages, 'brave-origin missing'
           print(f'Packages: {len(packages)} packages to install')
           "
+
+      - name: Run toolbox gaming test
+        run: ansible-playbook tests/toolbox/test_gaming.yml -i ansible/inventories/localhost/hosts.yml -c local
+
+      - name: Run toolbox business test
+        run: ansible-playbook tests/toolbox/test_business.yml -i ansible/inventories/localhost/hosts.yml -c local
+
+      - name: Run toolbox extras all test
+        run: ansible-playbook tests/toolbox/test_extras_all.yml -i ansible/inventories/localhost/hosts.yml -c local
 
       - name: Validate masked services
         run: python3 tests/validate_masked_services.py
