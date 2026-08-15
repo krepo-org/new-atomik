@@ -1,0 +1,4 @@
+[customizations.iso]
+volume_id = "ATOMIK_KDE"
+application_id = "Atomik KDE"
+publisher = "Atomik"

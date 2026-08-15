@@ -1,0 +1,21 @@
+FROM quay.io/fedora-ostree-desktops/kinoite:44
+
+RUN dnf -y remove kdeconnectd gdb gdb-headless plasma-drkonqi kdebugsettings \
+    && dnf -y install fish dracut-live squashfs-tools \
+    && rm -f /usr/share/plasma/look-and-feel/org.fedoraproject.fedora.desktop/metadata.json \
+       /usr/share/plasma/look-and-feel/org.fedoraproject.fedoradark.desktop/metadata.json \
+       /usr/share/plasma/look-and-feel/org.fedoraproject.fedoralight.desktop/metadata.json \
+       /usr/share/plasma/look-and-feel/org.kde.breezedark.desktop/metadata.json \
+       /usr/share/plasma/look-and-feel/org.kde.breezetwilight.desktop/metadata.json \
+    && dnf clean all
+
+COPY iso/skel/ /etc/skel/
+
+COPY ansible/ /opt/atomik/ansible/
+COPY Makefile /opt/atomik/Makefile
+COPY scripts/ /opt/atomik/scripts/
+COPY extra/ /opt/atomik/extra/
+COPY docs/ /opt/atomik/docs/
+COPY tests/ /opt/atomik/tests/
+
+RUN sed -i 's#^SHELL=.*#SHELL=/usr/bin/fish#' /etc/default/useradd

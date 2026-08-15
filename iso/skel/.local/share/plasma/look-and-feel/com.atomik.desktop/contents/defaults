@@ -1,0 +1,9 @@
+[kdeglobals][KDE]
+LookAndFeelPackage=com.atomik.desktop
+
+[plasmarc][Theme]
+name=org.kde.breeze.desktop
+
+[ksplashrc][KSplash]
+Engine=KSplashQML
+Theme=Breeze
