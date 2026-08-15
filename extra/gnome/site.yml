@@ -1,0 +1,207 @@
+---
+- name: Setup GNOME theme and settings
+  hosts: localhost
+  gather_facts: true
+  become: false
+
+  vars:
+    gnome_theme_dir: "~/.themes/Nordic"
+    gnome_icon_dir: "~/.icons"
+    gnome_cursor_dir: "~/.icons/Nordic-cursors"
+    gnome_theme_repo: "https://github.com/EliverLara/Nordic.git"
+    gnome_cursors_url: "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-cursors.tar.xz"
+    gnome_gsettings:
+      - schema: org.gnome.desktop.interface
+        key: gtk-theme
+        value: "'Nordic'"
+      - schema: org.gnome.desktop.wm.preferences
+        key: theme
+        value: "'Nordic'"
+      - schema: org.gnome.shell.extensions.user-theme
+        key: name
+        value: "'Nordic'"
+      - schema: org.gnome.desktop.interface
+        key: icon-theme
+        value: "'Tela-circle-nord-dark'"
+      - schema: org.gnome.desktop.interface
+        key: cursor-theme
+        value: "'Nordic-cursors'"
+      - schema: org.gnome.desktop.interface
+        key: font-name
+        value: "'Cantarell 11'"
+      - schema: org.gnome.desktop.interface
+        key: document-font-name
+        value: "'Cantarell 11'"
+      - schema: org.gnome.desktop.interface
+        key: monospace-font-name
+        value: "'Noto Sans Mono 11'"
+      - schema: org.gnome.desktop.interface
+        key: enable-animations
+        value: "false"
+      - schema: org.gnome.desktop.interface
+        key: show-battery-percentage
+        value: "true"
+      - schema: org.gnome.desktop.interface
+        key: clock-show-weekday
+        value: "true"
+      - schema: org.gnome.desktop.interface
+        key: color-scheme
+        value: "'prefer-dark'"
+      - schema: org.gnome.desktop.wm.preferences
+        key: button-layout
+        value: "':minimize,maximize,close'"
+      - schema: org.gnome.desktop.wm.preferences
+        key: mouse-button-modifier
+        value: "'<Super>'"
+      - schema: org.gnome.desktop.privacy
+        key: send-technical-reports
+        value: "false"
+      - schema: org.gnome.desktop.privacy
+        key: report-technical-problems
+        value: "false"
+      - schema: org.gnome.desktop.privacy
+        key: hide-identity
+        value: "true"
+      - schema: org.gnome.desktop.privacy
+        key: show-full-name-in-top-bar
+        value: "false"
+      - schema: org.gnome.desktop.peripherals.touchpad
+        key: natural-scroll
+        value: "true"
+      - schema: org.gnome.desktop.peripherals.touchpad
+        key: tap-to-click
+        value: "true"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: dock-position
+        value: "BOTTOM"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: dash-max-icon-size
+        value: "48"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: extend-height
+        value: "false"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: show-trash
+        value: "false"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: show-mounts
+        value: "false"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: show-show-apps-button
+        value: "true"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: autohide-in-fullscreen
+        value: "true"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: intellihide
+        value: "false"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: click-action
+        value: "'minimize'"
+      - schema: org.gnome.shell.extensions.dash-to-dock
+        key: background-opacity
+        value: "0.25"
+      - schema: org.gnome.desktop.wm.preferences
+        key: num-workspaces
+        value: "4"
+      - schema: org.gnome.mutter
+        key: dynamic-workspaces
+        value: "false"
+      - schema: org.gnome.mutter
+        key: edge-tiling
+        value: "true"
+      - schema: org.gnome.settings-daemon.plugins.color
+        key: night-light-enabled
+        value: "true"
+      - schema: org.gnome.settings-daemon.plugins.color
+        key: night-light-temperature
+        value: "3800"
+      - schema: org.gnome.settings-daemon.plugins.media-keys
+        key: max-screencast-length
+        value: "30"
+      - schema: org.gnome.nautilus.preferences
+        key: show-directory-item-counts
+        value: "'never'"
+      - schema: org.gnome.nautilus.preferences
+        key: default-folder-viewer
+        value: "'list-view'"
+      - schema: org.gnome.nautilus.list-view
+        key: default-zoom-level
+        value: "'small'"
+      - schema: org.gnome.desktop.search-providers
+        key: disable-external
+        value: "true"
+      - schema: org.gnome.desktop.sound
+        key: event-sounds
+        value: "false"
+
+  tasks:
+    - name: Check if GNOME theme already installed
+      ansible.builtin.stat:
+        path: "{{ gnome_theme_dir | expanduser }}"
+      register: theme_check
+
+    - name: Skip GNOME setup if already installed
+      when: theme_check.stat.exists
+      block:
+        - name: Skip message
+          ansible.builtin.debug:
+            msg: "Nordic theme already installed"
+
+    - name: Clone Nordic theme repo
+      ansible.builtin.git:
+        repo: "{{ gnome_theme_repo }}"
+        dest: "/tmp/nordic-theme"
+        depth: 1
+        single_branch: yes
+      register: git_clone
+      changed_when: git_clone.changed
+
+    - name: Install Nordic GTK theme
+      ansible.builtin.shell: |
+        mkdir -p "{{ gnome_theme_dir | expanduser }}"
+        for subdir in gtk-3.0 gtk-4.0 gnome-shell metacity-1 assets; do
+          if [ -d "/tmp/nordic-theme/$subdir" ]; then
+            cp -r "/tmp/nordic-theme/$subdir" "{{ gnome_theme_dir | expanduser }}/"
+          fi
+        done
+        if [ -f "/tmp/nordic-theme/index.theme" ]; then
+          cp "/tmp/nordic-theme/index.theme" "{{ gnome_theme_dir | expanduser }}/"
+        fi
+      args:
+        executable: /bin/bash
+      when: git_clone.changed
+
+    - name: Download Nordic cursors
+      ansible.builtin.get_url:
+        url: "{{ gnome_cursors_url }}"
+        dest: /tmp/nordic-cursors.tar.xz
+        mode: "0644"
+      register: cursor_download
+      changed_when: cursor_download.changed
+
+    - name: Install Nordic cursors
+      ansible.builtin.unarchive:
+        src: /tmp/nordic-cursors.tar.xz
+        dest: "{{ gnome_icon_dir | expanduser }}"
+        remote_src: yes
+      when: cursor_download.changed
+
+    - name: Cleanup temp files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/nordic-theme
+        - /tmp/nordic-cursors.tar.xz
+      when: theme_check.stat.exists == false
+
+    - name: Apply GNOME gsettings
+      ansible.builtin.command: >
+        gsettings set {{ item.schema }} {{ item.key }} {{ item.value }}
+      loop: "{{ gnome_gsettings }}"
+      loop_control:
+        label: "{{ item.schema }} {{ item.key }}"
+      register: gsettings_result
+      changed_when: gsettings_result.rc == 0
+      failed_when: false
