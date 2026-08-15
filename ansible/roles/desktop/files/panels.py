@@ -38,7 +38,6 @@ immutability=2
 lastScreen=0
 location=4
 plugin=org.kde.panel
-wallpaperplugin=org.kde.image
 
 [Containments][2][Applets][3]
 immutability=2
