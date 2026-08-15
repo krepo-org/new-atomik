@@ -849,10 +849,15 @@ atomik_kde_settings:
       group: KDE
       key: AnimationDurationFactor
       value: "0.5"
+  compositor:
     - file: kwinrc
       group: Compositing
-      key: OpenGLIsUnsafe
-      value: "true"
+      key: MaxFps
+      value: "120"
+    - file: kwinrc
+      group: Compositing
+      key: VSync
+      value: "auto"
   baloo:
     - file: baloofilerc
       group: Basic Settings
