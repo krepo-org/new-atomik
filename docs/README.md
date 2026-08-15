@@ -14,8 +14,12 @@ make apply-repos   # Configure repositories
 make apply-packages  # Install/remove packages
 make apply-security  # Apply security hardening
 make apply-desktop   # Configure desktop settings
-make apply-devtools  # Set up development tools
+make apply-extra-gnome   # Apply GNOME theme/settings
 make apply-extra-codium  # Install debloated VSCodium
+make apply-extra-devtools  # Set up development tools
+make apply-extra-flatpak  # Install Flatpak apps
+make apply-extra-gaming  # Install gaming Flatpaks
+make apply-extra-business  # Install business Flatpaks
 ```
 
 ## Security
@@ -30,8 +34,8 @@ ZRAM compressed swap, systemd-oomd with desktop-tuned thresholds, no earlyoom.
 
 ```
 ansible/          # Ansible playbooks + roles
-extra/            # Optional setup scripts (gnome, nix, codium, devtools)
-extra/codium/apply_codium.py     # Install and configure VSCodium
+extra/            # Optional ansible extras (gnome, codium, devtools, flatpak, gaming, business)
+extra/codium/site.yml     # Install and configure VSCodium
 ```
 
 ## Reset

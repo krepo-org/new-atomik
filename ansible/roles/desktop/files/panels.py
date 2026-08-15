@@ -158,7 +158,7 @@ view = """\
 [PlasmaViews][Panel 2]
 alignment=4
 floating=1
-opacity=1
+opacity=0.85
 panelLengthMode=1
 panelVisibility=1
 shell=org.kde.plasma.desktop

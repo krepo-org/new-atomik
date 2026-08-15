@@ -32,7 +32,6 @@ jobs:
       - name: Validate Python syntax and venv imports
         run: |
           /tmp/atomik-venv/bin/python3 -m py_compile extra/gnome/apply_gnome.py
-          /tmp/atomik-venv/bin/python3 -m py_compile extra/nix/apply_nix.py
           /tmp/atomik-venv/bin/python3 -m py_compile extra/codium/apply_codium.py
           /tmp/atomik-venv/bin/python3 -m py_compile extra/devtools/apply_devtools.py
           /tmp/atomik-venv/bin/python3 -m py_compile ansible/roles/desktop/files/panels.py

@@ -6,6 +6,14 @@
   changed_when: false
   failed_when: false
 
+- name: Install common packages
+  ansible.builtin.shell: |
+    rpm-ostree install -y --idempotent --allow-inactive {{ atomik_rpm_install | default([]) | join(' ') }}
+  when: atomik_rpm_install | default([]) | length > 0
+  register: common_install_result
+  changed_when: "'Queued' in common_install_result.stdout"
+  failed_when: false
+
 - name: Install variant-specific packages
   ansible.builtin.shell: |
     rpm-ostree install -y --idempotent --allow-inactive {{ atomik_variant_install[atomik_variant] | default([]) | join(' ') }}
@@ -16,10 +24,48 @@
 
 - name: Remove variant-specific packages
   ansible.builtin.shell: |
-    rpm-ostree override remove {{ atomik_variant_remove[atomik_variant] | default([]) | join(' ') }}
+    TARGET="{{ atomik_variant_remove[atomik_variant] | default([]) | join(' ') }}"
+    [ -z "$TARGET" ] && echo "none_to_remove" && exit 0
+    TO_REMOVE=""
+    for p in $TARGET; do
+      if rpm -q --root / "$p" >/dev/null 2>&1; then
+        TO_REMOVE="$TO_REMOVE $p"
+      fi
+    done
+    [ -z "$TO_REMOVE" ] && echo "none_to_remove" && exit 0
+    if rpm-ostree override remove $TO_REMOVE; then
+      echo "removed: $TO_REMOVE"
+    else
+      for p in $TO_REMOVE; do
+        rpm-ostree override remove "$p" 2>/dev/null && echo "removed: $p" || echo "skipped: $p"
+      done
+    fi
   when: atomik_variant_remove[atomik_variant] | default([]) | length > 0
   register: variant_remove_result
-  changed_when: "'Queued for removal' in variant_remove_result.stdout"
+  changed_when: "'removed:' in variant_remove_result.stdout"
+  failed_when: false
+
+- name: Remove common packages
+  ansible.builtin.shell: |
+    TARGET="{{ atomik_rpm_remove | default([]) | join(' ') }}"
+    [ -z "$TARGET" ] && echo "none_to_remove" && exit 0
+    TO_REMOVE=""
+    for p in $TARGET; do
+      if rpm -q --root / "$p" >/dev/null 2>&1; then
+        TO_REMOVE="$TO_REMOVE $p"
+      fi
+    done
+    [ -z "$TO_REMOVE" ] && echo "none_to_remove" && exit 0
+    if rpm-ostree override remove $TO_REMOVE; then
+      echo "removed: $TO_REMOVE"
+    else
+      for p in $TO_REMOVE; do
+        rpm-ostree override remove "$p" 2>/dev/null && echo "removed: $p" || echo "skipped: $p"
+      done
+    fi
+  when: atomik_rpm_remove | default([]) | length > 0
+  register: common_remove_result
+  changed_when: "'removed:' in common_remove_result.stdout"
   failed_when: false
 
 - name: Check if live changes are needed

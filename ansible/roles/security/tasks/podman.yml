@@ -6,6 +6,15 @@
     _podman_user_config: "/var/home/{{ atomik_user }}/.config/containers"
     _podman_user_storage: "/var/home/{{ atomik_user }}/.local/share/containers/storage"
 
+- name: Resolve user UID
+  ansible.builtin.command: getent passwd {{ atomik_user }}
+  register: _podman_user_uid_result
+  changed_when: false
+
+- name: Set user UID fact
+  ansible.builtin.set_fact:
+    _podman_user_uid: "{{ _podman_user_uid_result.stdout.split(':')[2] }}"
+
 - name: Deploy system containers.conf
   ansible.builtin.template:
     src: containers-system.conf.j2
@@ -21,6 +30,38 @@
     owner: "{{ atomik_user }}"
     group: "{{ atomik_user }}"
     mode: "0700"
+
+- name: Deploy system nested storage config
+  ansible.builtin.copy:
+    content: |
+      [storage]
+      driver = "overlay"
+      graphroot = "/var/lib/containers/storage-nested"
+      runroot = "/run/containers/storage-nested"
+
+      [storage.options.overlay]
+      mount_program = ""
+    dest: /etc/containers/storage-nested.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Deploy user nested storage config
+  ansible.builtin.copy:
+    content: |
+      [storage]
+      driver = "overlay"
+      graphroot = "{{ _podman_user_storage }}-nested"
+      runroot = "/run/user/{{ _podman_user_uid }}/containers-nested"
+
+      [storage.options.overlay]
+      mount_program = "/usr/bin/fuse-overlayfs"
+    dest: "{{ _podman_user_config }}/storage-nested.conf"
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0644"
+  become: true
 
 - name: Deploy user containers.conf
   ansible.builtin.template:

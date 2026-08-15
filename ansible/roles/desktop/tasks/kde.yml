@@ -73,11 +73,10 @@
 
 - name: Mask crashing X11 legacy daemon user units
   ansible.builtin.shell: |
-    systemctl --user mask plasma-kaccess.service
-    systemctl --user mask plasma-xembedsniproxy.service
-    systemctl --user mask plasma-gmenudbusmenuproxy.service
+    systemctl --user --machine={{ atomik_user }}@.host mask plasma-kaccess.service
+    systemctl --user --machine={{ atomik_user }}@.host mask plasma-xembedsniproxy.service
+    systemctl --user --machine={{ atomik_user }}@.host mask plasma-gmenudbusmenuproxy.service
   become: true
-  become_user: "{{ atomik_user }}"
   changed_when: false
 
 - name: Create KDE environment config directory
@@ -108,12 +107,34 @@
   become: true
 
 - name: Activate minimal look-and-feel
-  ansible.builtin.shell: lookandfeeltool --apply com.atomik.desktop
+  ansible.builtin.shell: QT_QPA_PLATFORM=offscreen lookandfeeltool --apply com.atomik.desktop
   become: true
   become_user: "{{ atomik_user }}"
   register: lnf_result
   changed_when: lnf_result.rc == 0
   failed_when: false
+
+- name: Hide stock look-and-feel themes via tmpfiles bind mounts
+  ansible.builtin.copy:
+    content: |
+      {% for theme in atomik_hidden_look_and_feel_themes | default([]) %}
+      d /run/atomik-hidden-themes/{{ theme }} 0755 root root -
+      {% endfor %}
+      {% for theme in atomik_hidden_look_and_feel_themes | default([]) %}
+      b /usr/share/plasma/look-and-feel/{{ theme }} - - - - /run/atomik-hidden-themes/{{ theme }}
+      {% endfor %}
+    dest: /etc/tmpfiles.d/atomik-hidden-themes.conf
+    mode: "0644"
+  become: true
+
+- name: Apply hidden look-and-feel theme bind mounts
+  ansible.builtin.shell: |
+    {% for theme in atomik_hidden_look_and_feel_themes | default([]) %}
+    mkdir -p "/run/atomik-hidden-themes/{{ theme }}"
+    mount --bind "/run/atomik-hidden-themes/{{ theme }}" "/usr/share/plasma/look-and-feel/{{ theme }}" 2>/dev/null || true
+    {% endfor %}
+  become: true
+  changed_when: false
 
 - name: Deploy KDE panel setup script
   ansible.builtin.copy:

@@ -5,6 +5,6 @@
     state: started
     enabled: true
     masked: false
-  loop: "{{ atomik_critical_services }}"
+  loop: "{{ atomik_critical_services[atomik_variant] | default([]) }}"
   register: ensure_result
   failed_when: ensure_result is failed and 'Could not find the requested service' not in ensure_result.msg
