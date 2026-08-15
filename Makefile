@@ -1,6 +1,6 @@
 .PHONY: all lint check test install-deps apply-core apply-all clean help
 .PHONY: apply-only-repos apply-only-packages apply-only-security apply-only-desktop
-.PHONY: apply-extra apply-extra-kde apply-extra-gnome apply-extra-nix apply-extra-codium apply-extra-devtools
+.PHONY: apply-extra apply-extra-gnome apply-extra-nix apply-extra-codium apply-extra-devtools
 
 PROJECT_DIR := $(shell pwd)
 ANSIBLE_CONFIG = $(PROJECT_DIR)/ansible/ansible.cfg
@@ -20,7 +20,6 @@ help:
 	@echo "  make apply-only-packages  Apply packages only"
 	@echo "  make apply-only-security  Apply security only"
 	@echo "  make apply-only-desktop   Apply desktop only"
-	@echo "  make apply-extra-kde      Apply KDE panels/theme"
 	@echo "  make apply-extra-gnome    Apply GNOME theme/settings"
 	@echo "  make apply-extra-nix      Setup Nix and install user packages"
 	@echo "  make apply-extra-codium   Install and configure debloated VSCodium"
@@ -30,10 +29,7 @@ help:
 
 apply-all: apply-core apply-extra
 
-apply-extra: apply-extra-kde apply-extra-gnome apply-extra-nix apply-extra-codium apply-extra-devtools
-
-apply-extra-kde:
-	python3 extra/kde/apply_kde.py
+apply-extra: apply-extra-gnome apply-extra-nix apply-extra-codium apply-extra-devtools
 
 apply-extra-gnome:
 	python3 extra/gnome/apply_gnome.py

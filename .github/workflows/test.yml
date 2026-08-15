@@ -165,19 +165,6 @@ jobs:
           print(f'RPM lists OK: {len(install)} install, {len(remove)} remove')
           "
 
-      - name: Log KDE theme configuration validation
-        run: |
-          /tmp/atomik-venv/bin/python3 -c "
-          import yaml
-          with open('ansible/group_vars/all.yml') as f:
-              cfg = yaml.safe_load(f)
-          t = cfg.get('atomik_kde_theme', {}).get('kinoite', {})
-          assert t.get('theme') == 'Nordic', 'theme != Nordic'
-          assert t.get('colorscheme') == 'Nordic', 'colorscheme != Nordic'
-          assert 'font' in t and 'icon_theme' in t and 'cursor_theme' in t
-          print('KDE theme config valid')
-          "
-
       - name: Log desktop scheduler validation
         run: |
           /tmp/atomik-venv/bin/python3 -c "
@@ -220,7 +207,7 @@ jobs:
         run: |
           python3 -c "
           import os
-          extras = ['business', 'codium', 'debloat', 'devtools', 'gaming', 'gnome', 'kde', 'nix', 'packages']
+          extras = ['business', 'codium', 'debloat', 'devtools', 'gaming', 'gnome', 'nix', 'packages']
           errors = []
           for ext in extras:
               ext_dir = f'extra/{ext}'

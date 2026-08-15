@@ -30,10 +30,7 @@ ZRAM compressed swap, systemd-oomd with desktop-tuned thresholds, no earlyoom.
 
 ```
 ansible/          # Ansible playbooks + roles
-extra/kde/        # KDE theme scripts and Python tools
-extra/kde/install_nordic_kde.py  # Nordic KDE theme installer
-extra/kde/apply_kde.py           # Apply KDE panels and theme
-extra/codium/     # Debloated VSCodium setup
+extra/            # Optional setup scripts (gnome, nix, codium, devtools)
 extra/codium/apply_codium.py     # Install and configure VSCodium
 ```
 
