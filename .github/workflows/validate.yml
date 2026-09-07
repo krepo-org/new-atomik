@@ -47,7 +47,7 @@ jobs:
       - name: Log Makefile targets validation
         run: |
           make -n lint 2>/dev/null || true
-          grep -q '^lint:' Makefile && grep -q '^test:' Makefile && grep -q '^clean:' Makefile
+          rg -q '^lint:' Makefile && rg -q '^test:' Makefile && rg -q '^clean:' Makefile
 
   verify-ansible-definitions:
     name: verify ansible definitions
@@ -172,4 +172,4 @@ jobs:
         run: test -f LICENSE
 
       - name: Log SPRINTS dot md structure verification
-        run: grep -q '^# ' SPRINTS.md
+        run: rg -q '^# ' SPRINTS.md

@@ -1,0 +1,15 @@
+{# OOMD user slice: scale with RAM #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+
+{% if ram_mb <= 4096 %}
+{% set memory_pressure_limit = 25 %}
+{% elif ram_mb <= 8192 %}
+{% set memory_pressure_limit = 28 %}
+{% else %}
+{% set memory_pressure_limit = 30 %}
+{% endif %}
+
+[Service]
+ManagedOOMMemoryPressure=kill
+ManagedOOMMemoryPressureLimit={{ memory_pressure_limit }}%
+ManagedOOMSwap=kill

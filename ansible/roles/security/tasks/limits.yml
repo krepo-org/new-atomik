@@ -2,7 +2,7 @@
 
 - name: Deploy security limits
   ansible.builtin.template:
-    src: limits.conf.j2
+    src: limits_dynamic.conf.j2
     dest: /etc/security/limits.d/99-atomik.conf
     owner: root
     group: root

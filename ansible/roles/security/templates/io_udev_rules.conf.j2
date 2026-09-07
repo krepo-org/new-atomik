@@ -1,0 +1,29 @@
+{# IO udev rules: scale with CPU cores and RAM #}
+{% set vcpus = ansible_facts['processor_vcpus'] | int %}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+
+{# nr_requests: scale with CPU cores #}
+{% if vcpus <= 4 %}
+{% set nr_requests = 32 %}
+{% elif vcpus <= 8 %}
+{% set nr_requests = 64 %}
+{% else %}
+{% set nr_requests = 128 %}
+{% endif %}
+
+{# read_ahead_kb: scale with RAM #}
+{% if ram_mb <= 4096 %}
+{% set read_ahead = 128 %}
+{% elif ram_mb <= 8192 %}
+{% set read_ahead = 256 %}
+{% else %}
+{% set read_ahead = 512 %}
+{% endif %}
+
+{# HDD gets deeper queues and larger read-ahead #}
+{% set hdd_nr_requests = [nr_requests * 2, 256] | min %}
+{% set hdd_read_ahead = [read_ahead * 4, 2048] | min %}
+
+ACTION=="add|change", SUBSYSTEM=="block", KERNEL=="nvme*n*", ATTR{queue/scheduler}="none", ATTR{queue/nr_requests}="{{ nr_requests }}", ATTR{queue/read_ahead_kb}="{{ read_ahead }}", ATTR{queue/nomerges}="2", ATTR{queue/rq_affinity}="2", ATTR{queue/iostats}="0"
+ACTION=="add|change", SUBSYSTEM=="block", KERNEL=="sd*[!0-9]|vd*[!0-9]|mmcblk*[!0-9]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="none", ATTR{queue/nr_requests}="{{ nr_requests }}", ATTR{queue/read_ahead_kb}="{{ read_ahead }}", ATTR{queue/nomerges}="2", ATTR{queue/rq_affinity}="2"
+ACTION=="add|change", SUBSYSTEM=="block", KERNEL=="sd*[!0-9]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq", ATTR{queue/nr_requests}="{{ hdd_nr_requests }}", ATTR{queue/read_ahead_kb}="{{ hdd_read_ahead }}", ATTR{queue/nomerges}="2", ATTR{queue/rq_affinity}="2"

@@ -7,41 +7,8 @@
     project_root: "{{ playbook_dir }}/.."
 
   pre_tasks:
-    - name: Detect OS variant
-      ansible.builtin.shell: |
-        refspec=$(ostree admin status 2>/dev/null | grep -oP 'ostree://\K[^: ]+' || echo "")
-        if echo "$refspec" | grep -q "silverblue"; then
-          echo "silverblue"
-        elif echo "$refspec" | grep -q "kinoite"; then
-          echo "kinoite"
-        elif echo "$refspec" | grep -q "cosmic-atomic"; then
-          echo "cosmic-atomic"
-        else
-          echo "silverblue"
-        fi
-      register: variant_result
-      changed_when: false
-
-    - name: Set variant fact
-      ansible.builtin.set_fact:
-        atomik_variant: "{{ variant_result.stdout }}"
-
-    - name: Detect desktop environment
-      ansible.builtin.set_fact:
-        atomik_desktop: >-
-          {%- if atomik_variant == 'kinoite' -%}kde
-          {%- elif atomik_variant == 'cosmic-atomic' -%}cosmic
-          {%- else -%}gnome{%- endif -%}
-
     - name: Get real user
-      ansible.builtin.shell: |
-        if [ -n "$SUDO_USER" ]; then
-          echo "$SUDO_USER"
-        elif [ -n "$PKEXEC_UID" ]; then
-          getent passwd "$PKEXEC_UID" | cut -d: -f1
-        else
-          echo "$USER"
-        fi
+      ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/shared/get_real_user.fish"
       register: user_result
       changed_when: false
 
@@ -50,18 +17,6 @@
         atomik_user: "{{ user_result.stdout }}"
 
   tasks:
-    - name: Verify variant detection
-      ansible.builtin.assert:
-        that:
-          - atomik_variant in ['silverblue', 'kinoite', 'cosmic-atomic']
-        fail_msg: "Invalid variant: {{ atomik_variant }}"
-
-    - name: Verify desktop detection
-      ansible.builtin.assert:
-        that:
-          - atomik_desktop in ['gnome', 'kde', 'cosmic']
-        fail_msg: "Invalid desktop: {{ atomik_desktop }}"
-
     - name: Verify user detection
       ansible.builtin.assert:
         that:
@@ -182,11 +137,6 @@
         that:
           - test_sysctl.fs['file-max'] == 9223372036854775807
           - test_sysctl.kernel.dmesg_restrict == 1
-
-    - name: Test variant-specific config parsing
-      ansible.builtin.assert:
-        that:
-          - atomik_variant in ['silverblue', 'kinoite', 'cosmic-atomic']
 
     - name: All e2e tests passed
       ansible.builtin.debug:

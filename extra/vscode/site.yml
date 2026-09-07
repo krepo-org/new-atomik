@@ -1,0 +1,73 @@
+---
+- name: Install and configure VS Code with vsconf
+  hosts: localhost
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Detect real user
+      ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/shared/get_real_user.fish"
+      register: user_result
+      changed_when: false
+    - name: Set real user fact
+      ansible.builtin.set_fact:
+        ansible_user_id: "{{ user_result.stdout }}"
+
+  vars:
+    vsconf_repo: https://github.com/redigere/vsconf.git
+    vsconf_install_dir: "/var/home/{{ ansible_user_id }}/.local/share/vsconf"
+    vscode_config_dir: "/var/home/{{ ansible_user_id }}/.config/Code"
+
+  tasks:
+    - name: Skip in containers
+      ansible.builtin.include_role:
+        name: shared
+        tasks_from: skip_in_containers.yml
+
+    - name: Ensure python3-venv is available
+      ansible.builtin.package:
+        name: python3
+        state: present
+
+    - name: Clone vsconf repository
+      ansible.builtin.git:
+        repo: "{{ vsconf_repo }}"
+        dest: "{{ vsconf_install_dir }}"
+        version: main
+        force: true
+
+    - name: Create Python virtual environment
+      ansible.builtin.command:
+        cmd: python3 -m venv .venv
+        chdir: "{{ vsconf_install_dir }}"
+      args:
+        creates: "{{ vsconf_install_dir }}/.venv/bin/python"
+
+    - name: Install vsconf in editable mode
+      ansible.builtin.pip:
+        name: ".[dev]"
+        editable: true
+        virtualenv: "{{ vsconf_install_dir }}/.venv"
+      args:
+        chdir: "{{ vsconf_install_dir }}"
+
+    - name: Create User config directory
+      ansible.builtin.file:
+        path: "{{ vscode_config_dir }}/User"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: "0755"
+
+    - name: Run vsconf install
+      ansible.builtin.shell: |
+        source .venv/bin/activate && vsconf install
+      args:
+        chdir: "{{ vsconf_install_dir }}"
+        executable: /bin/bash
+      become: true
+      become_user: "{{ ansible_user_id }}"
+
+    - name: Clean VS Code cache
+      ansible.builtin.shell: "rm -rf {{ vscode_config_dir }}/Cache {{ vscode_config_dir }}/CachedData {{ vscode_config_dir }}/CachedExtensionVSIXs {{ vscode_config_dir }}/CachedExtensions '{{ vscode_config_dir }}/Code Cache' {{ vscode_config_dir }}/GPUCache {{ vscode_config_dir }}/logs '{{ vscode_config_dir }}/Service Worker' {{ vscode_config_dir }}/sessionStorage {{ vscode_config_dir }}/blob_storage"
+      changed_when: false

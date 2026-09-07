@@ -1,0 +1,15 @@
+---
+- name: Deploy WiFi restart service
+  ansible.builtin.copy:
+    content: "{{ atomik_wifi_restart_service }}"
+    dest: /etc/systemd/system/atomik-wifi-restart.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Enable WiFi restart service
+  ansible.builtin.systemd:
+    name: atomik-wifi-restart
+    enabled: true
+    daemon_reload: true

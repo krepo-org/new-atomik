@@ -1,8 +1,8 @@
 ---
 
 - name: Deploy swapfile service
-  ansible.builtin.copy:
-    content: "{{ atomik_swapfile_service }}"
+  ansible.builtin.template:
+    src: swapfile.service.j2
     dest: /etc/systemd/system/atomik-swapfile.service
     owner: root
     group: root
@@ -12,8 +12,8 @@
     - Enable swapfile service
 
 - name: Deploy swapfile unit
-  ansible.builtin.copy:
-    content: "{{ atomik_swapfile_unit }}"
+  ansible.builtin.template:
+    src: swapfile.unit.j2
     dest: /etc/systemd/system/var-swapfile.swap
     owner: root
     group: root

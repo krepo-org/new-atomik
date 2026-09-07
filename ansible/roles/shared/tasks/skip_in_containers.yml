@@ -1,0 +1,8 @@
+---
+- name: Skip in containers
+  when: >
+    ansible_facts.get('virtualization_type', '') == 'container' or
+    ansible_facts.get('file', {}).get('/run/.toolboxenv', {}).get('exists', false)
+  block:
+    - name: End play
+      ansible.builtin.meta: end_play

@@ -6,7 +6,6 @@
     state: stopped
     enabled: false
     masked: true
-  failed_when: false
 
 - name: Remove legacy swapfile service files
   ansible.builtin.file:
@@ -15,7 +14,6 @@
   loop:
     - /etc/systemd/system/bora-swapfile.service
     - /etc/systemd/system/multi-user.target.wants/bora-swapfile.service
-  failed_when: false
 
 - name: Find legacy OOMD dropins
   ansible.builtin.find:
@@ -49,55 +47,103 @@
     label: "{{ item.path }}"
   notify: Reload systemd
 
+- name: Find legacy OOMD main config
+  ansible.builtin.find:
+    paths: /etc/systemd/oomd.conf.d
+    patterns: "99-bora.conf"
+    file_type: file
+  register: legacy_oomd_config
+
 - name: Remove legacy OOMD main config
   ansible.builtin.file:
     path: /etc/systemd/oomd.conf.d/99-bora.conf
     state: absent
-  failed_when: false
+  when: legacy_oomd_config.files | length > 0
+
+- name: Find legacy sysctl configs
+  ansible.builtin.find:
+    paths: /etc/sysctl.d
+    patterns: "99-bora-*.conf"
+    file_type: file
+  register: legacy_sysctl
 
 - name: Remove legacy sysctl configs
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     state: absent
-  loop:
-    - /etc/sysctl.d/99-bora-hardening.conf
-    - /etc/sysctl.d/99-bora-dynamic.conf
-  failed_when: false
+  loop: "{{ legacy_sysctl.files | default([]) }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Find legacy limits config
+  ansible.builtin.find:
+    paths: /etc/security/limits.d
+    patterns: "99-bora.conf"
+    file_type: file
+  register: legacy_limits
 
 - name: Remove legacy limits config
   ansible.builtin.file:
     path: /etc/security/limits.d/99-bora.conf
     state: absent
-  failed_when: false
+  when: legacy_limits.files | length > 0
+
+- name: Find legacy container hook
+  ansible.builtin.find:
+    paths: /etc/profile.d
+    patterns: "z-bora-container-hook.sh"
+    file_type: file
+  register: legacy_hook
 
 - name: Remove legacy container hook
   ansible.builtin.file:
     path: /etc/profile.d/z-bora-container-hook.sh
     state: absent
-  failed_when: false
+  when: legacy_hook.files | length > 0
+
+- name: Find legacy status file
+  ansible.builtin.find:
+    paths: /etc
+    patterns: "bora-status.json"
+    file_type: file
+  register: legacy_status
 
 - name: Remove legacy status file
   ansible.builtin.file:
     path: /etc/bora-status.json
     state: absent
-  failed_when: false
+  when: legacy_status.files | length > 0
+
+- name: Find legacy fail2ban config
+  ansible.builtin.find:
+    paths: /etc/fail2ban/jail.d
+    patterns: "bora.local"
+    file_type: file
+  register: legacy_fail2ban
 
 - name: Remove legacy fail2ban config
   ansible.builtin.file:
     path: /etc/fail2ban/jail.d/bora.local
     state: absent
-  failed_when: false
+  when: legacy_fail2ban.files | length > 0
+
+- name: Find legacy swapfile unit
+  ansible.builtin.find:
+    paths: /etc/systemd/system
+    patterns: "var-swapfile.swap"
+    file_type: file
+  register: legacy_swapfile_unit
 
 - name: Remove legacy swapfile unit
   ansible.builtin.file:
     path: /etc/systemd/system/var-swapfile.swap
     state: absent
-  failed_when: false
+  when: legacy_swapfile_unit.files | length > 0
 
 - name: Clean legacy transaction temp dirs
-  ansible.builtin.shell: |
-    rm -rf /var/home/{{ atomik_user }}/.tmp/bora-transaction-*
-  failed_when: false
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/security/tasks/legacy_cleanup/clean_transaction_temp.fish"
+  environment:
+    ATOMIK_USER: "{{ atomik_user }}"
   become: true
   become_user: "{{ atomik_user }}"
 
@@ -106,7 +152,6 @@
     path: "/var/home/{{ atomik_user }}/.config/containers/containers.conf"
     regexp: '.*z-bora-container-hook.*'
     state: absent
-  failed_when: false
 
 - name: Remove legacy container hook volume from system containers.conf
   ansible.builtin.lineinfile:
@@ -114,7 +159,6 @@
     regexp: '.*z-bora-container-hook.*'
     state: absent
   become: true
-  failed_when: false
 
 - name: Fix legacy volume_path in system containers.conf
   ansible.builtin.replace:
@@ -122,7 +166,6 @@
     regexp: '/var/lib/containers/storage/bora/'
     replace: '/var/lib/containers/storage/'
   become: true
-  failed_when: false
 
 - name: Fix legacy paths in system storage-nested.conf
   ansible.builtin.replace:
@@ -130,4 +173,3 @@
     regexp: '/storage/bora/'
     replace: '/storage/'
   become: true
-  failed_when: false

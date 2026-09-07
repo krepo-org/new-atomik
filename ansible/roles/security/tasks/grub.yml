@@ -7,6 +7,22 @@
     group: root
     mode: "0755"
 
+- name: Detect active GPU drivers
+  ansible.builtin.shell: |
+    drivers=""
+    lsmod | grep -q '^amdgpu ' && drivers="$drivers amdgpu"
+    lsmod | grep -q '^nvidia ' && drivers="$drivers nvidia"
+    lsmod | grep -q '^i915 ' && drivers="$drivers i915"
+    lsmod | grep -q '^xe ' && drivers="$drivers xe"
+    echo "$drivers" | xargs
+  register: gpu_drivers_result
+  changed_when: false
+
+- name: Set GPU drivers fact
+  ansible.builtin.set_fact:
+    atomik_gpu_drivers: "{{ gpu_drivers_result.stdout.split() }}"
+    atomik_gpu_module: "{{ (gpu_drivers_result.stdout.split() | first) | default('none') }}"
+
 - name: Deploy GRUB performance config
   ansible.builtin.template:
     src: grub-performance.cfg.j2
@@ -24,3 +40,12 @@
     group: root
     mode: "0644"
   notify: Rebuild grub
+
+- name: Deploy modprobe GPU options
+  ansible.builtin.template:
+    src: modprobe-gpu.conf.j2
+    dest: /etc/modprobe.d/99-atomik-gpu.conf
+    owner: root
+    group: root
+    mode: "0644"
+  when: atomik_gpu_drivers | length > 0

@@ -1,11 +1,22 @@
+if test -f ~/.local/share/omf/init.fish
+    source ~/.local/share/omf/init.fish
+end
+
 if status is-interactive
     set -g fish_greeting ""
+    {# Fish history: scale with disk space #}
+    {% set disk_total_bytes = ansible_facts['mounts'] | selectattr('mount', 'eq', '/') | map(attribute='size_total') | first | default(107374182400) | int %}
+    {% set disk_gb = (disk_total_bytes / 1073741824) | round(0) | int %}
+    {% if disk_gb <= 32 %}
+    set -g fish_history_max 5000
+    {% elif disk_gb <= 128 %}
     set -g fish_history_max 10000
+    {% else %}
+    set -g fish_history_max 50000
+    {% endif %}
     alias ll="ls -l"
     alias la="ls -la"
     alias update="rpm-ostree upgrade"
-    alias cleanup="rpm-ostree cleanup -m"
+    alias cleanup="rpm-ostree cleanup -mp --base --rollback"
     alias rebuild="rpm-ostree initramfs --enable && rpm-ostree upgrade"
-    alias ide="idea"
-    alias astudio="android-studio"
 end

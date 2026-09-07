@@ -16,3 +16,12 @@
     group: root
     mode: "0644"
   notify: Reload sysctl
+
+- name: Deploy network dynamic sysctl config
+  ansible.builtin.template:
+    src: sysctl_network_dynamic.conf.j2
+    dest: /etc/sysctl.d/99-atomik-network-dynamic.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload sysctl

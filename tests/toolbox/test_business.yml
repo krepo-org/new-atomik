@@ -10,15 +10,9 @@
 
   tasks:
     - name: Skip in containers
-      when: >
-        ansible_facts.get('virtualization_type', '') == 'container' or
-        ansible_facts.get('file', {}).get('/run/.toolboxenv', {}).get('exists', false)
-      block:
-        - name: Skip message
-          ansible.builtin.debug:
-            msg: "Skipping business test in container environment"
-        - name: End play
-          ansible.builtin.meta: end_play
+      ansible.builtin.include_role:
+        name: shared
+        tasks_from: skip_in_containers.yml
 
     - name: Verify business site.yml exists
       ansible.builtin.stat:

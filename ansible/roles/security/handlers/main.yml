@@ -5,22 +5,22 @@
     state: reloaded
 
 - name: Reload sysctl
-  ansible.builtin.shell: sysctl --system
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/security/handlers/reload_sysctl.fish"
 
 - name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true
 
 - name: Reload udev
-  ansible.builtin.shell: udevadm control --reload-rules && udevadm trigger
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/security/handlers/reload_udev.fish"
 
 - name: Apply tuned profile
-  ansible.builtin.shell: tuned-adm profile atomik
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/security/handlers/apply_tuned_profile.fish"
 
 - name: Enable thermald
   ansible.builtin.systemd:
     name: thermald
-    state: started
+    state: restarted
     enabled: true
 
 - name: Restart zram
@@ -46,11 +46,9 @@
     state: restarted
 
 - name: Rebuild grub
-  ansible.builtin.shell: |
-    if command -v grub2-mkconfig &>/dev/null; then
-      grub2-mkconfig -o /boot/grub2/grub.cfg
-    elif command -v grub-mkconfig &>/dev/null; then
-      grub-mkconfig -o /boot/grub/grub.cfg
-    else
-      echo "No grub-mkconfig found"
-    fi
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/security/handlers/rebuild_grub.fish"
+
+- name: Restart systemd-logind
+  ansible.builtin.systemd:
+    name: systemd-logind
+    state: restarted

@@ -1,0 +1,34 @@
+{# Desktop scheduler: scale with RAM and CPU #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+{% set vcpus = ansible_facts['processor_vcpus'] | int %}
+
+{% if ram_mb <= 4096 %}
+{% set tasks_max = 4096 %}
+{% elif ram_mb <= 8192 %}
+{% set tasks_max = 8192 %}
+{% else %}
+{% set tasks_max = 16384 %}
+{% endif %}
+
+{# CPU priority: higher on low-core (needs more boost), lower on high-core (plenty of headroom) #}
+{% if vcpus <= 4 %}
+{% set cpu_priority = 4 %}
+{% set nice = -15 %}
+{% elif vcpus <= 8 %}
+{% set cpu_priority = 3 %}
+{% set nice = -10 %}
+{% else %}
+{% set cpu_priority = 2 %}
+{% set nice = -5 %}
+{% endif %}
+
+[Service]
+OOMScoreAdjust=-1000
+IOSchedulingClass=realtime
+IOSchedulingPriority=0
+CPUSchedulingPolicy=rr
+CPUSchedulingPriority={{ cpu_priority }}
+Nice={{ nice }}
+MemoryHigh=infinity
+MemoryMax=infinity
+TasksMax={{ tasks_max }}

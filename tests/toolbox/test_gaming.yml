@@ -11,15 +11,9 @@
 
   tasks:
     - name: Skip in containers
-      when: >
-        ansible_facts.get('virtualization_type', '') == 'container' or
-        ansible_facts.get('file', {}).get('/run/.toolboxenv', {}).get('exists', false)
-      block:
-        - name: Skip message
-          ansible.builtin.debug:
-            msg: "Skipping gaming test in container environment"
-        - name: End play
-          ansible.builtin.meta: end_play
+      ansible.builtin.include_role:
+        name: shared
+        tasks_from: skip_in_containers.yml
 
     - name: Verify gaming site.yml exists
       ansible.builtin.stat:
@@ -40,7 +34,7 @@
 
     - name: Verify Discord override parameters
       ansible.builtin.debug:
-        msg: "Discord override: Wayland + PulseAudio + DRI + KDE StatusNotifier"
+        msg: "Discord override: X11 + PulseAudio + DRI + KDE StatusNotifier"
 
     - name: Verify Heroic override includes filesystem access
       ansible.builtin.debug:

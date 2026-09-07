@@ -1,0 +1,27 @@
+---
+- name: Deploy battery threshold script
+  ansible.builtin.copy:
+    content: "{{ atomik_battery_threshold_script }}"
+    dest: /usr/local/bin/atomik-battery-threshold.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy battery charge threshold service
+  ansible.builtin.copy:
+    content: "{{ atomik_battery_threshold_service }}"
+    dest: /etc/systemd/system/atomik-battery-threshold.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Enable battery charge threshold service
+  ansible.builtin.systemd:
+    name: atomik-battery-threshold
+    enabled: true
+    daemon_reload: true
+
+- name: Apply battery charge threshold now
+  ansible.builtin.command: /usr/local/bin/atomik-battery-threshold.sh
+  changed_when: false

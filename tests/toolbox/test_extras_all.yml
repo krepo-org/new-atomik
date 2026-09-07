@@ -7,10 +7,9 @@
   vars:
     expected_extras:
       - business
-      - codium
+      - vscode
       - flatpak
       - gaming
-      - gnome
       - packages
 
   tasks:

@@ -1,320 +1,15 @@
 ---
 
 atomik_variant_install:
-  silverblue:
-    - eog
-    - gnome-calculator
-    - gnome-console
-    - gnome-tweaks
-    - mission-center
-  kinoite: []
-  cosmic-atomic: []
+  cosmic-atomic:
+    - file-roller
 
 atomik_variant_remove:
-  silverblue:
-    - desktop-backgrounds-gnome
-    - evince
-    - fedora-workstation-backgrounds
-    - file-roller
-    - gnome-backgrounds
-    - gnome-calendar
-    - gnome-characters
-    - gnome-classic-session
-    - gnome-clocks
-    - gnome-contacts
-    - gnome-disk-utility
-    - gnome-flashback
-    - gnome-font-viewer
-    - gnome-initial-setup
-    - gnome-logs
-    - gnome-maps
-    - gnome-panel
-    - gnome-shell-extension-window-list
-    - gnome-tour
-    - gnome-weather
-    - malcontent-control
-    - metacity
-    - orca
-    - ptyxis
-    - rhythmbox
-    - totem
-    - yelp
-    - gnome-text-editor
-    - gnome-screenshot
-    - gnome-software
-    - gnome-shell-extension-apps-icon
-    - gnome-shell-extension-apps-menu
-    - gnome-shell-extension-common
-    - gnome-shell-extension-desktop-icons-ng
-    - gnome-shell-extension-horizontal-workspaces
-    - gnome-shell-extension-launch-new-instance
-    - gnome-shell-extension-places-icon
-    - gnome-shell-extension-system-monitor
-    - gnome-shell-extension-user-theme
-    - gnome-shell-extensions
-    - gnome-multi-writer
-    - gnome-music
-    - gnome-photos
-    - gnome-terminal
-    - gnome-connections
-    - gnome-disks
-    - gnome-control-center
-    - gnome-bluetooth
-    - gnome-usage
-    - baobab
-    - cheese
-    - dconf-editor
-    - four-in-a-row
-    - gnome-chess
-    - gnome-klotski
-    - gnome-mahjongg
-    - gnome-mines
-    - gnome-nibbles
-    - gnome-robots
-    - gnome-sudoku
-    - gnome-taquin
-    - gnome-tetravex
-    - iagno
-    - lightsoff
-    - swell-foop
-    - tali
-    - hitori
-    - five-or-more
-    - quadrapassel
-    - aisleriot
-    - atomix
-    - glade
-    - nemiver
-    - gnome-builder
-    - gnome-code-assistance
-    - gnome-devel-docs
-    - accerciser
-    - alacarte
-    - gnome-documents
-    - gnome-menus
-    - gnome-nettool
-    - gnome-power-manager
-    - gnome-screensaver
-    - gnome-search-tool
-    - gnome-system-log
-    - gnome-system-monitor
-    - gnome-themes
-    - gnome-themes-extra
-    - gnome-video-effects
-    - ghex
-    - gbrainy
-    - vinagre
-    - vinetheme
-    - seahorse
-    - totem-plugin-visualization
-    - totem-video-thumbnailer
-    - gnome-boxes
-    - gnome-netstatus
-    - gnome-pie
-    - gnome-pomodoro
-    - gnome-sound-recorder
-    - gnome-split
-    - gnome-subtitles
-    - gnome-symbols
-    - gnome-todo
-    - gnome-twitch
-    - gnome-web
-    - gnome-shell-extension-dash-to-dock
-    - gnome-shell-extension-dash-to-panel
-    - gnome-shell-extension-topicons
-    - gnome-shell-extension-workspaces-to-dock
-    - gnome-shell-extension-no-hot-corners
-    - gnome-shell-extension-just-perfection
-    - gnome-shell-extension-arc-menu
-    - gnome-shell-extension-ding
-    - gnome-shell-extension-material-shell
-    - gnome-shell-extension-pop-shell
-    - gnome-shell-extension-tiling-assistant
-    - gnome-shell-extension-vitals
-    - gnome-shell-extension-cpupower
-    - gnome-shell-extension-gestureImprovements
-    - gnome-classic-session-wayland
-    - gnome-classic-session-x11
-    - gnome-session-wayland
-    - gnome-session-x11
-    - gnome-session
-    - gnome-shell
-    - gnome-terminal-nautilus
-    - gnome-viewport
-    - gnome-volume-control
-    - gnome-online-miners
-    - gnome-online-accounts
-    - gnome-remote-desktop
-    - gnome-settings-daemon
-    - gnome-shell-extension-gsconnect
-    - gnome-software-editor
-    - gnome-shell-extension-system-monitor-applet
-    - gnome-shell-extension-unite
-    - gnome-shell-extension-gtile
-    - gnome-shell-extension-calc
-    - gnome-shell-extension-clipboard-indicator
-    - gnome-shell-extension-sound-output-device-chooser
-    - gnome-shell-extension-proxy-switcher
-    - gnome-shell-extension-weather
-    - gnome-shell-extension-openweather
-    - gnome-shell-extension-caffeine
-    - gnome-shell-extension-night-theme-switcher
-    - gnome-shell-extension-emoji-selector
-    - gnome-shell-extension-forge
-    - gnome-shell-extension-removable-drive-menu
-    - gnome-shell-extension-extensions
-    - gnome-shell-extension-places-status-indicator
-    - gnome-shell-extension-workspace-indicator
-    - gnome-shell-extension-auto-move-windows
-    - gnome-shell-extension-drive-menu
-    - gnome-shell-extension-native-window-placement
-    - gnome-shell-extension-screenshot-window-sizer
-    - gnome-shell-extension-status-menu
-    - gnome-shell-extension-updater
-    - gnome-color-manager
-  kinoite:
-    - akonadi
-    - akonadi-calendar
-    - akonadi-calendar-tools
-    - akonadi-import-wizard
-    - akonadi-mime
-    - akonadi-notes
-    - akonadi-search
-    - akonadiserver
-    - artikulate
-    - blinken
-    - cantor
-    - desktop-backgrounds-gnome
-    - dragon
-    - elisa
-    - fedora-workstation-backgrounds
-    - filelight
-    - gdb
-    - gdb-headless
-    - gnome-backgrounds
-    - gwenview
-    - juk
-    - k3b
-    - kaddressbook
-    - kalarm
-    - kalgebra
-    - kalzium
-    - kamoso
-    - kanagram
-    - kate
-    - kblackbox
-    - kblocks
-    - kbounce
-    - kbruch
-    - kdenlive
-    - kde-connect
-    - kde-connect-libs
-    - kdeconnectd
-    - kdebugsettings
-    - kdepim-addons
-    - kdepim-runtime
-    - kdevelop
-    - kdevelop-pg-qt
-    - kfind
-    - kfourinline
-    - kgeography
-    - kgoldrunner
-    - khangman
-    - khelpcenter
-    - kig
-    - kigo
-    - killbots
-    - kinfocenter
-    - kiriki
-    - kiten
-    - kjournald
-    - kjumpingcube
-    - klettres
-    - klickety
-    - klines
-    - kmail
-    - kmail-account-wizard
-    - kmines
-    - kmix
-    - kmplayer
-    - kmplot
-    - knetwalk
-    - knode
-    - knotes
-    - kolf
-    - kollision
-    - konquest
-    - kontact
-    - korganizer
-    - kpat
-    - krdc
-    - kreversi
-    - krfb
-    - krfb-libs
-    - krusader
-    - ksame
-    - kscd
-    - kshisen
-    - ksirk
-    - ksquares
-    - kstars
-    - ksudoku
-    - ksysguard
-    - ksystemlog
-    - ktimer
-    - ktnef
-    - ktouch
-    - ktron
-    - kturtle
-    - kubrick
-    - kuser
-    - kwave
-    - kwordquiz
-    - lskat
-    - marble
-    - okular
-    - palapeli
-    - partitionmanager
-    - picmi
-    - pim-data-exporter
-    - pim-sieve-editor
-    - pim-storage-service-manager
-    - plasma-disks
-    - plasma-drkonqi
-    - plasma-welcome
-    - plasma-welcome-fedora
-    - print-manager
-    - rocs
-    - step
-    - umbrella
-    - kde-spectacle
-    - kde-gtk-config
-    - khotkeys
-    - krunner
-    - kscreen
-    - kscreen-doctor
-    - ksshaskpass
-    - ksystemstats
-    - plasma-systemmonitor
-    - kwin-x11
-    - oxygen-sounds
-    - sddm-kcm
-    - plasma-nano
-    - plasma-mobile
-    - plasma-browser-integration
-    - fedora-chromium-config-kde
-    - plasma-discover-offline-updates
-    - plasma-vault
-    - plasma-workspace-wallpapers
-    - plasma5-integration
-    - colord-kde
-    - drkonqi
-    - packagekit
-    - packagekit-command-line
   cosmic-atomic:
     - adwaita-qt5
     - adwaita-qt6
     - ark
+    - ark-libs
     - fedora-chromium-config
     - kio-extras
     - kio-fuse
@@ -332,7 +27,6 @@ atomik_variant_remove:
     - desktop-backgrounds-gnome
     - fedora-workstation-backgrounds
     - evince
-    - file-roller
     - gnome-calendar
     - gnome-characters
     - gnome-clocks
@@ -402,7 +96,7 @@ atomik_variant_remove:
     - plasma-integration
     - plasma-pa
     - plasma-systemmonitor
-    - plasma-nano
+    - plasma-micro
     - plasma-mobile
     - plasma5-integration
     - xdg-desktop-portal-kde
@@ -489,16 +183,18 @@ atomik_variant_remove:
 atomik_rpm_install:
   - powertop
   - brave-origin
-  - host-spawn
   - fish
   - fontawesome-fonts-all
+  - google-noto-color-emoji-fonts
+  - kbd-consolefonts
+  - perl
   - tuned-utils
+  - micro
+  - ripgrep
 
 atomik_rpm_remove:
   - firefox
   - firefox-langpacks
-  - google-noto-emoji-fonts
-  - default-fonts-core-emoji
   - libreoffice-core
   - libreoffice-draw
   - libreoffice-impress
@@ -514,8 +210,11 @@ atomik_rpm_remove:
   - libreoffice-help-en-US
   - libreoffice-data-en-US
   - libreoffice-gtk3
-  - libreoffice-icon-theme
   - libsane-hpaio
+  - host-spawn
+  - default-editor
+  - nano-default-editor
+  - nano
 
 atomik_repositories:
   brave-browser:
@@ -546,7 +245,8 @@ atomik_sysctl:
   fs:
     file-max: 9223372036854775807
     inotify:
-      max_user_watches: 524288
+      max_user_instances: 1024
+      max_user_watches: 2097152
     protected_fifos: 2
     protected_hardlinks: 1
     protected_regular: 2
@@ -558,17 +258,10 @@ atomik_sysctl:
     kptr_restrict: 2
     numa_balancing: 0
     panic: 10
-    pid_max: 4194304
     printk: "3 3 3 3"
     sched_autogroup_enabled: 0
-    perf_cpu_time_max_percent: 1
     perf_event_paranoid: -1
-    sched_latency_ns: 6000000
-    sched_migration_cost_ns: 500000
-    sched_min_granularity_ns: 3000000
-    sched_wakeup_granularity_ns: 4000000
     sysrq: 0
-    threads-max: 1048576
     timer_migration: 0
     unprivileged_bpf_disabled: 1
   net:
@@ -595,16 +288,8 @@ atomik_sysctl:
       tcp_sack: 1
       tcp_mtu_probing: 1
       tcp_slow_start_after_idle: 0
-      tcp_notsent_lowat: 131072
-      udp_mem: "2097152 4194304 8388608"
     core:
       default_qdisc: fq
-      rmem_max: 16777216
-      wmem_max: 16777216
-      rmem_default: 262144
-      wmem_default: 262144
-      netdev_max_backlog: 5000
-      optmem_max: 25165824
     ipv6:
       conf:
         all:
@@ -624,9 +309,7 @@ atomik_sysctl:
     dirty_writeback_centisecs: 100
     dirtytime_expire_seconds: 200
     extfrag_threshold: 100
-    max_map_count: 2147483642
     overcommit_memory: 1
-    overcommit_ratio: 50
     page_cluster: 0
     page_lock_unfairness: 1
     panic_on_oom: 0
@@ -664,42 +347,7 @@ atomik_permissions:
   /etc/shadow: "0000"
   /root: "0700"
 
-atomik_oomd_config: |
-  [OOM]
-  SwapUsedLimit=10%
-  DefaultMemoryPressureLimit=5%
-  DefaultMemoryPressureDurationSec=500ms
-
-atomik_oomd_user_slice: |
-  [Service]
-  ManagedOOMMemoryPressure=kill
-  ManagedOOMMemoryPressureLimit=10%
-  ManagedOOMSwap=kill
-
-atomik_oomd_protected_config: |
-  [Service]
-  ManagedOOMMemoryPressure=kill
-  ManagedOOMMemoryPressureLimit=50%
-  ManagedOOMSwap=kill
-  OOMScoreAdjust=-1000
-
-atomik_cgroup_user_slice: |
-  [Slice]
-  MemoryHigh=75%
-  MemoryMax=90%
-  TasksMax=4096
-
-atomik_cgroup_protected_default: |
-  [Service]
-  MemoryHigh=infinity
-  MemoryMax=infinity
-  TasksMax=8192
-
-atomik_cgroup_app_slice: |
-  [Slice]
-  MemoryHigh=50%
-  MemoryMax=75%
-  TasksMax=2048
+atomik_vconsole_font: "lat2-16"
 
 atomik_cgroup_cpu_weight_compositor: |
   [Service]
@@ -710,36 +358,21 @@ atomik_cgroup_cpu_weight_app: |
   CPUShares=1024
 
 atomik_oomd_protected_services:
-  silverblue:
-    - gdm
-    - gnome-session
-    - gnome-session-wayland
-    - gnome-session-x11
-    - gnome-shell
-    - pipewire
-    - pipewire-pulse
-    - wireplumber
-  kinoite:
-    - kwin
-    - pipewire
-    - pipewire-pulse
-    - plasma-shell
-    - startplasma
-    - wireplumber
-    - alsa-state
   cosmic-atomic:
     - cosmic-comp
+    - cosmic-session
+    - cosmic-panel
+    - cosmic-greeter
+    - cosmic-osd
     - pipewire
     - pipewire-pulse
     - wireplumber
 
 atomik_desktop_scheduler_services:
-  silverblue:
-    - gnome-shell
-  kinoite:
-    - kwin
   cosmic-atomic:
     - cosmic-comp
+    - cosmic-session
+    - cosmic-panel
 
 atomik_zram_config: |
   [zram0]
@@ -758,450 +391,9 @@ atomik_zram_config: |
 atomik_zram_udev_rules: |
   ACTION=="add", KERNEL=="zram[0-9]*", ATTR{comp_algorithm}="zstd lzo-rle lz4", ATTR{max_comp_streams}="$(nproc)", ATTR{writeback_limit}="0"
 
-atomik_swapfile_service: |
-  [Unit]
-  Description=Atomik Swapfile Creator
-  ConditionPathExists=!/var/swapfile
-
-  [Service]
-  Type=oneshot
-  ExecStart=/sbin/btrfs filesystem mkswapfile --size 4G /var/swapfile
-  RemainAfterExit=yes
-
-  [Install]
-  WantedBy=multi-user.target
-
-atomik_swapfile_unit: |
-  [Unit]
-  Description=Atomik Disk Swapfile
-  Requires=atomik-swapfile.service
-  After=atomik-swapfile.service
-
-  [Swap]
-  What=/var/swapfile
-  Priority=10
-
-  [Install]
-  WantedBy=swap.target
-
-atomik_io_udev_rules: |
-  ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none", ATTR{queue/nr_requests}="64", ATTR{queue/read_ahead_kb}="256", ATTR{queue/nomerges}="2", ATTR{queue/rq_affinity}="2", ATTR{queue/iostats}="0"
-  ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/scheduler}="bfq", ATTR{queue/nr_requests}="64", ATTR{queue/read_ahead_kb}="256", ATTR{queue/nomerges}="2", ATTR{queue/rq_affinity}="2"
-  ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/max_sectors_kb}="128"
-  ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/max_sectors_kb}="128"
-  ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{device/queue_depth}="64"
-  ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{device/queue_depth}="32"
-
-atomik_thp_tmpfiles: |
-  w /sys/kernel/mm/transparent_hugepage/enabled - - - - always
-  w /sys/kernel/mm/transparent_hugepage/defrag - - - - never
-  w /sys/kernel/mm/transparent_hugepage/khugepaged/defrag - - - - 0
-  w /sys/kernel/mm/transparent_hugepage/khugepaged/alloc_sleep_millisecs - - - - 10000
-  w /sys/kernel/mm/transparent_hugepage/khugepaged/scan_sleep_millisecs - - - - 10000
-  w /sys/kernel/mm/transparent_hugepage/khugepaged/max_ptes_none - - - - 512
-  w /sys/kernel/mm/transparent_hugepage/shmem_enabled - - - - never
-  w /sys/kernel/mm/transparent_hugepage/use_zero_page - - - - 0
-
-atomik_desktop_scheduler_config: |
-  [Service]
-  OOMScoreAdjust=-1000
-  IOSchedulingClass=realtime
-  IOSchedulingPriority=0
-  CPUSchedulingPolicy=rr
-  CPUSchedulingPriority=4
-  Nice=-15
-  MemoryHigh=infinity
-  MemoryMax=infinity
-  TasksMax=16384
-
-atomik_desktop_scheduler_config_rt: |
-  [Service]
-  CPUAccounting=yes
-  MemoryAccounting=yes
-  IOAccounting=yes
-  TasksAccounting=yes
-  IPAccounting=yes
-
 atomik_default_shell: /usr/bin/fish
-atomik_gnome_dconf:
-  - path: /org/gnome/desktop/interface/enable-animations
-    value: "false"
-  - path: /org/gnome/desktop/privacy/send-technical-reports
-    value: "false"
-  - path: /org/gnome/desktop/privacy/report-technical-problems
-    value: "false"
-  - path: /org/gnome/desktop/search-providers/disable-external
-    value: "true"
-  - path: /org/gnome/desktop/lockdown/disable-command-line
-    value: "false"
-
-atomik_kde_settings:
-  animations:
-    - file: kdeglobals
-      group: KDE
-      key: AnimationDurationFactor
-      value: "0.5"
-  baloo:
-    - file: baloofilerc
-      group: Basic Settings
-      key: Indexing-Enabled
-      value: "false"
-  power:
-    - file: powermanagementprofilesrc
-      group: AC
-      key: acHandleButtonEvent
-      value: "1"
-    - file: powermanagementprofilesrc
-      group: Battery
-      key: batteryHandleButtonEvent
-      value: "1"
-    - file: powermanagementprofilesrc
-      group: AC
-      key: idleTimeout
-      value: "300000"
-    - file: powermanagementprofilesrc
-      group: AC
-      key: suspendThenHibernate
-      value: "false"
-  taskbar:
-    - file: plasma-org.kde.plasma.desktop-appletsrc
-      group: PlasmaViews
-      key: layoutPlugins
-      value: org.kde.plasma.icontasks
-    - file: plasma-org.kde.plasma.desktop-appletsrc
-      group: ConfigDialog
-      key: fillWidth
-      value: "true"
-  telemetry:
-    - file: kuserfeedbackrc
-      group: UserFeedback
-      key: TelemetryLevel
-      value: "0"
-    - file: kdeglobals
-      group: KUserFeedback
-      key: TelemetryLevel
-      value: "0"
-  wallet:
-    - file: kwalletrc
-      group: Wallet
-      key: Enabled
-      value: "false"
-    - file: kwalletrc
-      group: Wallet
-      key: First Use
-      value: "false"
-  restrictions:
-    - file: kdeglobals
-      group: KDE Action Restrictions
-      key: plasma/plasmashell/unlocked
-      value: "false"
-  compositor:
-    - file: kwinrc
-      group: Compositing
-      key: Backend
-      value: OpenGL
-    - file: kwinrc
-      group: Compositing
-      key: MaxFps
-      value: "120"
-    - file: kwinrc
-      group: Compositing
-      key: VSync
-      value: auto
-    - file: kwinrc
-      group: Compositing
-      key: Enabled
-      value: "true"
-  notifications:
-    - file: kdeglobals
-      group: Sounds
-      key: Enabled
-      value: "false"
-  effects:
-    - file: kwinrc
-      group: Plugins
-      key: blurEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: cubeEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: diminactiveEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: fadeEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: fallapartEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: fullscreenEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: glideEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: loginEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: logoutEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: magiclampEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: maximizeEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: overviewEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: scaleEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: sheetEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: slideEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: slidebackEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: slidingnotificationsEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: slidingpopupsEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: squashEnabled
-      value: "true"
-    - file: kwinrc
-      group: Plugins
-      key: wobblywindowsEnabled
-      value: "true"
-  kded:
-    - file: kded6rc
-      group: Module-browserintegrationflatpakintegrator
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-browserintegrationreminder
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-device_automounter
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-dnssdwatcher
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-donationmessage
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-freespacenotifier
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-geotimezoned
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-kded_bolt
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-kded_plasma_welcome
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-kwrited
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-lookandfeelautoswitcher
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-oom_notifier
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-remotenotifier
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-smart
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-smbwatcher
-      key: autoload
-      value: "false"
-    - file: kded6rc
-      group: Module-wpad-detector
-      key: autoload
-      value: "false"
-  lock:
-    - file: kscreenlockerrc
-      group: Daemon
-      key: Autolock
-      value: "false"
-    - file: kscreenlockerrc
-      group: Daemon
-      key: LockOnResume
-      value: "false"
-  screen_edges:
-    - file: kwinrc
-      group: ScreenEdges
-      key: RemainActiveOnFullscreen
-      value: "true"
-
-atomik_kde_disabled_autostart:
-  - baloo_file.desktop
-  - geoclue-demo-agent.desktop
-  - gmenudbusmenuproxy.desktop
-  - org.kde.discover.notifier.desktop
-  - org.kde.kdeconnect.daemon.desktop
-  - org.kde.kunifiedpush-distributor.desktop
-  - org.kde.xwaylandvideobridge.desktop
-  - pam_kwallet_init.desktop
-  - xembedsniproxy.desktop
-
-atomik_hidden_look_and_feel_themes:
-  - org.fedoraproject.fedora.desktop
-  - org.fedoraproject.fedoradark.desktop
-  - org.fedoraproject.fedoralight.desktop
-  - org.kde.breezedark.desktop
-  - org.kde.breezetwilight.desktop
-
-atomik_kde_powerdevil: |
-  [AC][Display]
-  DimDisplayWhenIdle=false
-  TurnOffDisplayWhenIdle=false
-  LockBeforeTurnOffDisplay=false
-
-  [AC][SuspendAndShutdown]
-  AutoSuspendIdleTimeoutSec=0
-
-  [Battery][Display]
-  DimDisplayWhenIdle=false
-  TurnOffDisplayWhenIdle=false
-  LockBeforeTurnOffDisplay=false
-
-  [Battery][SuspendAndShutdown]
-  AutoSuspendIdleTimeoutSec=0
-
-atomik_kde_config_files:
-  - kdeglobals
-  - kwinrc
-  - plasma-org.kde.plasma.desktop-appletsrc
-  - kwalletrc
-  - powermanagementprofilesrc
-  - breezerc
-  - konsolerc
-  - knotifyrc
-  - kcminputrc
-  - kscreenlockerrc
-
-
-atomik_ego_extensions:
-  - dash-to-dock@micxgx.gmail.com
-atomik_ego_base_url: "https://extensions.gnome.org"
-atomik_ego_install_dir: "/home/{{ atomik_user }}/.local/share/gnome-shell/extensions"
-
-atomik_gnome_dconf_full:
-  - path: /org/gnome/desktop/interface/enable-animations
-    value: "false"
-  - path: /org/gnome/desktop/interface/font-name
-    value: "'Cantarell 11'"
-  - path: /org/gnome/desktop/interface/document-font-name
-    value: "'Cantarell 11'"
-  - path: /org/gnome/desktop/interface/monospace-font-name
-    value: "'Noto Sans Mono 11'"
-  - path: /org/gnome/desktop/wm/preferences/button-layout
-    value: "':minimize,maximize,close'"
-  - path: /org/gnome/desktop/interface/show-battery-percentage
-    value: "true"
-  - path: /org/gnome/desktop/interface/clock-show-weekday
-    value: "true"
-  - path: /org/gnome/desktop/interface/clock-show-seconds
-    value: "false"
-  - path: /org/gnome/desktop/wm/preferences/mouse-button-modifier
-    value: "'<Super>'"
-  - path: /org/gnome/desktop/privacy/report-technical-problems
-    value: "false"
-  - path: /org/gnome/desktop/privacy/send-technical-reports
-    value: "false"
-  - path: /org/gnome/desktop/privacy/disable-microphone
-    value: "true"
-  - path: /org/gnome/desktop/privacy/disable-camera
-    value: "true"
-  - path: /org/gnome/desktop/search-providers/disable-external
-    value: "true"
-  - path: /org/gnome/desktop/sound/event-sounds
-    value: "false"
-  - path: /org/gnome/desktop/peripherals/touchpad/natural-scroll
-    value: "true"
-  - path: /org/gnome/desktop/peripherals/touchpad/tap-to-click
-    value: "true"
-  - path: /org/gnome/desktop/peripherals/mouse/natural-scroll
-    value: "true"
-  - path: /org/gnome/shell/overrides/attach-modal-dialogs
-    value: "false"
-  - path: /org/gnome/shell/overrides/workspaces-only-on-primary
-    value: "true"
-  - path: /org/gnome/mutter/check-alive-timeout
-    value: "uint32 3000"
-  - path: /org/gnome/mutter/dynamic-workspaces
-    value: "true"
-  - path: /org/gnome/mutter/center-new-windows
-    value: "true"
-  - path: /org/gnome/settings-daemon/plugins/color/night-light-enabled
-    value: "true"
-  - path: /org/gnome/settings-daemon/plugins/color/night-light-temperature
-    value: "uint32 3800"
-  - path: /org/gnome/desktop/interface/accent-color
-    value: "'blue'"
-  - path: /org/freedesktop/tracker/miner/files/enable-fs-watchers
-    value: "false"
 
 atomik_critical_services:
-  silverblue:
-    - NetworkManager
-    - systemd-resolved
-    - upower
-    - bluetooth
-    - sshd
-    - gdm
-  kinoite:
-    - NetworkManager
-    - systemd-resolved
-    - upower
-    - bluetooth
-    - sshd
-    - plasmalogin
   cosmic-atomic:
     - NetworkManager
     - systemd-resolved
@@ -1209,6 +401,7 @@ atomik_critical_services:
     - bluetooth
     - sshd
     - cosmic-greeter
+    - cosmic-osd
 
 atomik_masked_services:
   - abrtd
@@ -1222,7 +415,6 @@ atomik_masked_services:
   - geoclue
   - gssproxy
   - ModemManager
-  - NetworkManager-wait-online
   - packagekit
   - packagekit-offline-update
   - pmie
@@ -1234,13 +426,76 @@ atomik_alsa_power_save: |
   options snd_hda_intel power_save=0
   options snd_hda_intel power_save_controller=N
 
-atomik_kde_environment: |
-  KWIN_WAYLAND_NO_SUSPEND=1
-  KWIN_WAYLAND_SERVER_LOGGING=false
+atomik_logind_conf: |
+  [Login]
+  IdleAction=ignore
+  IdleActionSec=infinity
+  HandleSuspendKey=ignore
+  HandleHibernateKey=ignore
+  HandleLidSwitch=ignore
+  HandleLidSwitchExternalPower=ignore
+  HandleLidSwitchDocked=ignore
+  PowerKeyIgnoreInhibited=yes
+  SuspendKeyIgnoreInhibited=yes
+  HibernateKeyIgnoreInhibited=yes
 
-atomik_gnome_environment: |
-  MUTTER_DEBUG_DISABLE_VBLANK=1
-  MUTTER_DEBUG_FORCE_KMS_MODE=simple
+atomik_dpms_udev_rules: |
+  ACTION=="add", SUBSYSTEM=="drm", KERNEL=="card*", RUN+="/usr/bin/xset -dpms 2>/dev/null || true"
+
+atomik_wifi_restart_service: |
+  [Unit]
+  Description=Restart NetworkManager if WiFi not connected
+  After=network-online.target
+  Wants=network-online.target
+  ConditionPathExists=!/run/atomik-wifi-checked
+
+  [Service]
+  Type=oneshot
+  ExecStart=/bin/bash -c 'sleep 5 && nmcli -t -f TYPE,STATE connection show | grep -q "wifi:activated" || systemctl restart NetworkManager'
+  RemainAfterExit=yes
+
+  [Install]
+  WantedBy=multi-user.target
+
+atomik_battery_charge_threshold: 85
+
+atomik_battery_threshold_script: |
+  #!/bin/bash
+  for bat in /sys/class/power_supply/BAT*/charge_control_end_threshold; do
+    [ -f "$bat" ] && echo {{ atomik_battery_charge_threshold }} > "$bat"
+  done
+
+atomik_battery_threshold_service: |
+  [Unit]
+  Description=Set battery charge threshold to {{ atomik_battery_charge_threshold }}%
+  Before=graphical.target
+
+  [Service]
+  Type=oneshot
+  ExecStart=/usr/local/bin/atomik-battery-threshold.sh
+  RemainAfterExit=yes
+
+  [Install]
+  WantedBy=multi-user.target
+
+atomik_cosmic_environment: |
+  DISPLAY=:0
+  ELECTRON_OZONE_PLATFORM_HINT=x11
+  ELECTRON_OZONE_PLATFORM=x11
+  OZONE_PLATFORM_HINT=x11
+  GDK_BACKEND=wayland,x11
+  QT_QPA_PLATFORM=wayland,xcb
+  QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+  MOZ_ENABLE_WAYLAND=1
+  SDL_VIDEODRIVER=wayland,x11
   CLUTTER_BACKEND=wayland
-  CLUTTER_SHOW_FPS=0
-  __GL_MaxFramesAllowed=1
+  GBM_BACKEND=wayland
+  WLR_NO_HARDWARE_CURSORS=1
+  WLR_RENDERER_VULKAN=0
+  LIBGL_ALWAYS_SOFTWARE=0
+  __GL_SYNC_TO_VBLANK=1
+  __GL_SYNC_DISPLAY=1
+  __GLX_VENDOR_LIBRARY_NAME=mesa
+  MESA_GL_VERSION_OVERRIDE=4.6
+  MESA_GLSL_VERSION_OVERRIDE=460
+  VDPAU_DRIVER=vaapi

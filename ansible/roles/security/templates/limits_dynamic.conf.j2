@@ -1,0 +1,37 @@
+{# Security limits: scale with RAM #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+
+{# memlock: 0.5% of RAM, min 8 MB, max 128 MB #}
+{% set memlock = [(ram_mb * 1024 // 200), 8388608] | max %}
+{% set memlock = [memlock, 134217728] | min %}
+
+{# nofile: scales with RAM - low RAM=512K, high RAM=4M #}
+{% if ram_mb <= 4096 %}
+{% set nofile_hard = 524288 %}
+{% set nofile_soft = 262144 %}
+{% elif ram_mb <= 8192 %}
+{% set nofile_hard = 1048576 %}
+{% set nofile_soft = 524288 %}
+{% else %}
+{% set nofile_hard = 2097152 %}
+{% set nofile_soft = 1048576 %}
+{% endif %}
+
+{# nproc: scales with RAM #}
+{% if ram_mb <= 4096 %}
+{% set nproc_hard = 32768 %}
+{% set nproc_soft = 16384 %}
+{% elif ram_mb <= 8192 %}
+{% set nproc_hard = 131072 %}
+{% set nproc_soft = 65536 %}
+{% else %}
+{% set nproc_hard = 524288 %}
+{% set nproc_soft = 262144 %}
+{% endif %}
+
+* hard memlock {{ memlock }}
+* hard nofile {{ nofile_hard }}
+* hard nproc {{ nproc_hard }}
+* soft memlock {{ memlock }}
+* soft nofile {{ nofile_soft }}
+* soft nproc {{ nproc_soft }}

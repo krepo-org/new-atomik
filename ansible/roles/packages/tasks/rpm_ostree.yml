@@ -1,113 +1,74 @@
 ---
 - name: Save toolbox container list
-  ansible.builtin.shell: |
-    podman ps -a --filter label=com.github.containers.toolbox=true --format '{% raw %}{{.Names}}{% endraw %}' 2>/dev/null | sort | tr '\n' ' '
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/shared/save_toolbox_list.fish"
   register: toolbox_before
   changed_when: false
-  failed_when: false
 
 - name: Install common packages
-  ansible.builtin.shell: |
-    rpm-ostree install -y --idempotent --allow-inactive {{ atomik_rpm_install | default([]) | join(' ') }}
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/packages/tasks/rpm_ostree/install_common_packages.fish"
+  environment:
+    ATOMIK_RPM_INSTALL: "{{ atomik_rpm_install | default([]) | join(' ') }}"
   when: atomik_rpm_install | default([]) | length > 0
   register: common_install_result
   changed_when: "'Queued' in common_install_result.stdout"
-  failed_when: false
+  failed_when: common_install_result.rc != 0 and 'already installed' not in common_install_result.stdout
 
 - name: Install variant-specific packages
-  ansible.builtin.shell: |
-    rpm-ostree install -y --idempotent --allow-inactive {{ atomik_variant_install[atomik_variant] | default([]) | join(' ') }}
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/packages/tasks/rpm_ostree/install_variant_packages.fish"
+  environment:
+    ATOMIK_VARIANT_PACKAGES: "{{ atomik_variant_install[atomik_variant] | default([]) | join(' ') }}"
   when: atomik_variant_install[atomik_variant] | default([]) | length > 0
   register: variant_install_result
   changed_when: "'Queued' in variant_install_result.stdout"
-  failed_when: false
+  failed_when: variant_install_result.rc != 0 and 'already installed' not in variant_install_result.stdout
 
 - name: Remove variant-specific packages
-  ansible.builtin.shell: |
-    TARGET="{{ atomik_variant_remove[atomik_variant] | default([]) | join(' ') }}"
-    [ -z "$TARGET" ] && echo "none_to_remove" && exit 0
-    TO_REMOVE=""
-    for p in $TARGET; do
-      if rpm -q --root / "$p" >/dev/null 2>&1; then
-        TO_REMOVE="$TO_REMOVE $p"
-      fi
-    done
-    [ -z "$TO_REMOVE" ] && echo "none_to_remove" && exit 0
-    if rpm-ostree override remove $TO_REMOVE; then
-      echo "removed: $TO_REMOVE"
-    else
-      for p in $TO_REMOVE; do
-        rpm-ostree override remove "$p" 2>/dev/null && echo "removed: $p" || echo "skipped: $p"
-      done
-    fi
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/packages/tasks/rpm_ostree/remove_variant_packages.fish"
+  environment:
+    ATOMIK_VARIANT_REMOVE: "{{ atomik_variant_remove[atomik_variant] | default([]) | join(' ') }}"
   when: atomik_variant_remove[atomik_variant] | default([]) | length > 0
   register: variant_remove_result
   changed_when: "'removed:' in variant_remove_result.stdout"
-  failed_when: false
+  failed_when: variant_remove_result.rc != 0 and 'not installed' not in variant_remove_result.stdout and 'No packages to remove' not in variant_remove_result.stdout
 
 - name: Remove common packages
-  ansible.builtin.shell: |
-    TARGET="{{ atomik_rpm_remove | default([]) | join(' ') }}"
-    [ -z "$TARGET" ] && echo "none_to_remove" && exit 0
-    TO_REMOVE=""
-    for p in $TARGET; do
-      if rpm -q --root / "$p" >/dev/null 2>&1; then
-        TO_REMOVE="$TO_REMOVE $p"
-      fi
-    done
-    [ -z "$TO_REMOVE" ] && echo "none_to_remove" && exit 0
-    if rpm-ostree override remove $TO_REMOVE; then
-      echo "removed: $TO_REMOVE"
-    else
-      for p in $TO_REMOVE; do
-        rpm-ostree override remove "$p" 2>/dev/null && echo "removed: $p" || echo "skipped: $p"
-      done
-    fi
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/packages/tasks/rpm_ostree/remove_common_packages.fish"
+  environment:
+    ATOMIK_RPM_REMOVE: "{{ atomik_rpm_remove | default([]) | join(' ') }}"
   when: atomik_rpm_remove | default([]) | length > 0
   register: common_remove_result
   changed_when: "'removed:' in common_remove_result.stdout"
-  failed_when: false
+  failed_when: common_remove_result.rc != 0 and 'not installed' not in common_remove_result.stdout and 'No packages to remove' not in common_remove_result.stdout
 
 - name: Check if live changes are needed
-  ansible.builtin.shell: |
-    rpm-ostree status --json | python3 -c '
-    import json, sys
-    d = json.load(sys.stdin).get("deployments", [])
-    b = [x for x in d if x.get("booted")]
-    pkgs = b[0].get("packages", []) + b[0].get("requested-packages", []) if b else []
-    sys.exit(0 if pkgs else 1)
-    '
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/shared/check_live_changes.fish"
   register: pending_changes
   changed_when: false
-  failed_when: false
 
 - name: Apply live changes
-  ansible.builtin.shell: rpm-ostree apply-live --allow-replacement
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/shared/apply_live_changes.fish"
   register: apply_result
   changed_when: apply_result.rc == 0
-  failed_when: false
+  failed_when: apply_result.rc != 0
   when: pending_changes.rc == 0
 
+- name: Rebuild font cache
+  ansible.builtin.shell: fc-cache -f
+  become: true
+  changed_when: false
+
 - name: Verify toolbox containers preserved
-  ansible.builtin.shell: |
-    SAVED="{{ toolbox_before.stdout }}"
-    [ -z "$SAVED" ] && echo "no_toolbox_containers" && exit 0
-    CURRENT=$(podman ps -a --filter label=com.github.containers.toolbox=true --format '{% raw %}{{.Names}}{% endraw %}' 2>/dev/null | sort | tr '\n' ' ')
-    for name in $SAVED; do
-      FOUND=0
-      for cname in $CURRENT; do
-        [ "$name" = "$cname" ] && FOUND=1 && break
-      done
-      [ "$FOUND" = 0 ] && echo "MISSING: $name"
-    done
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/shared/verify_toolbox.fish"
+  environment:
+    TOOLBOX_BEFORE: "{{ toolbox_before.stdout }}"
   register: toolbox_verify
   changed_when: false
-  failed_when: false
+  failed_when: toolbox_verify.rc != 0 and toolbox_verify.stdout != "no_toolbox_containers"
   when: apply_result.changed
 
 - name: Warn about missing toolbox containers
   ansible.builtin.debug:
-    msg: "ATTENZIONE: container toolbox persi dopo apply-live: {{ toolbox_verify.stdout }}"
+    msg: "Missing toolbox containers after apply-live: {{ toolbox_verify.stdout }}"
   when:
     - toolbox_verify.stdout_lines is defined
     - toolbox_verify.stdout_lines | length > 0

@@ -1,0 +1,51 @@
+{# Journald: scale with disk space and type #}
+{% set disk_total_bytes = ansible_facts['mounts'] | selectattr('mount', 'eq', '/') | map(attribute='size_total') | first | default(107374182400) %}
+{% set disk_total_gb = (disk_total_bytes / 1073741824) | round(1) %}
+
+{# Detect if root is on SSD (rotational=0) or HDD (rotational=1) #}
+{% set root_dev = ansible_facts['mounts'] | selectattr('mount', 'eq', '/') | map(attribute='device') | first | default('/dev/sda1') %}
+{% set is_ssd = true %}
+{% for mount in ansible_facts['mounts'] %}
+{% if mount.mount == '/' %}
+{% set dev_name = mount.device | basename %}
+{% if mount.get('options', '') is search('rotational') %}
+{% set is_ssd = false %}
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{# SystemMaxUse: 0.1% of disk, min 100M, max 1G #}
+{% set system_max_mb = [(disk_total_gb * 1024 * 0.001) | int, 100] | max %}
+{% set system_max_mb = [system_max_mb, 1024] | min %}
+
+{# RuntimeMaxUse: 1/5 of SystemMaxUse, min 50M, max 200M #}
+{% set runtime_max_mb = [(system_max_mb // 5), 50] | max %}
+{% set runtime_max_mb = [runtime_max_mb, 200] | min %}
+
+{# SyncInterval: SSD=5m, HDD=15m (less frequent to reduce write wear) #}
+{% if is_ssd %}
+{% set sync_interval = "5m" %}
+{% else %}
+{% set sync_interval = "15m" %}
+{% endif %}
+
+{# MaxRetention: scale with disk #}
+{% if disk_total_gb <= 32 %}
+{% set max_retention = "3day" %}
+{% elif disk_total_gb <= 128 %}
+{% set max_retention = "7day" %}
+{% else %}
+{% set max_retention = "14day" %}
+{% endif %}
+
+[Journal]
+RateLimitIntervalSec=0
+RateLimitBurst=0
+Compress=yes
+SyncIntervalSec={{ sync_interval }}
+SystemMaxUse={{ system_max_mb }}M
+RuntimeMaxUse={{ runtime_max_mb }}M
+MaxRetentionSec={{ max_retention }}
+MaxFileSec=1day
+ForwardToSyslog=no
+ForwardToWall=no

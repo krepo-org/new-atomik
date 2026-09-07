@@ -1,10 +1,70 @@
 ---
 
-- name: Deploy thermald config
-  ansible.builtin.template:
-    src: thermal-conf.xml.j2
-    dest: /etc/thermald/thermal-conf.xml
-    owner: root
-    group: root
-    mode: "0644"
-  notify: Enable thermald
+- name: Detect CPU vendor
+  ansible.builtin.set_fact:
+    atomik_cpu_vendor: >-
+      {%- if 'GenuineIntel' in (ansible_facts['processor'] | string) -%}intel
+      {%- elif 'AuthenticAMD' in (ansible_facts['processor'] | string) -%}amd
+      {%- else -%}other{%- endif -%}
+
+- name: Configure thermald for Intel platforms
+  when: atomik_cpu_vendor == 'intel'
+  block:
+    - name: Detect active CPU thermal sensor
+      ansible.builtin.shell: |
+        sensor=""
+        for s in x86_pkg_temp TCPU cpu_thermal; do
+          if grep -qs "^$s" /sys/class/thermal/thermal_zone*/type 2>/dev/null; then
+            sensor="$s"
+            break
+          fi
+        done
+        echo "${sensor:-x86_pkg_temp}"
+      register: detected_sensor_result
+      changed_when: false
+
+    - name: Detect hardware critical temperature (TJMax)
+      ansible.builtin.shell: |
+        crit=$(cat /sys/devices/platform/coretemp.*/hwmon/hwmon*/temp*_crit 2>/dev/null | head -n 1)
+        if [ -n "$crit" ] && [ "$crit" -ge 60000 ] 2>/dev/null; then
+          echo "$crit"
+        else
+          echo "100000"
+        fi
+      register: detected_tjmax_result
+      changed_when: false
+
+    - name: Compute dynamic thermal thresholds
+      ansible.builtin.set_fact:
+        atomik_thermal_sensor: "{{ detected_sensor_result.stdout }}"
+        atomik_temp_critical: "{{ detected_tjmax_result.stdout | int }}"
+        atomik_temp_hot: "{{ (detected_tjmax_result.stdout | int) - 3000 }}"
+        atomik_temp_passive: "{{ (detected_tjmax_result.stdout | int) - 10000 }}"
+
+    - name: Deploy dynamic thermald config
+      ansible.builtin.template:
+        src: thermal-conf.xml.j2
+        dest: /etc/thermald/thermal-conf.xml
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Ensure thermald service is running and active
+      ansible.builtin.systemd:
+        name: thermald
+        state: restarted
+        enabled: true
+
+- name: Disable thermald on non-Intel platforms (handled by kernel/k10temp)
+  when: atomik_cpu_vendor != 'intel'
+  block:
+    - name: Ensure thermald config absent
+      ansible.builtin.file:
+        path: /etc/thermald/thermal-conf.xml
+        state: absent
+
+    - name: Disable thermald service on non-Intel CPUs
+      ansible.builtin.systemd:
+        name: thermald
+        enabled: false
+        state: stopped

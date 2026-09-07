@@ -1,0 +1,11 @@
+[Unit]
+Description=Atomik Disk Swapfile
+Requires=atomik-swapfile.service
+After=atomik-swapfile.service
+
+[Swap]
+What=/var/swapfile
+Priority=10
+
+[Install]
+WantedBy=swap.target

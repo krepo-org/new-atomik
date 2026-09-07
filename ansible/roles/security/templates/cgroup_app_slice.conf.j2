@@ -1,0 +1,21 @@
+{# Cgroup app slice: scale with RAM #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+
+{% if ram_mb <= 4096 %}
+{% set memory_high = 40 %}
+{% set memory_max = 60 %}
+{% set tasks_max = 512 %}
+{% elif ram_mb <= 8192 %}
+{% set memory_high = 45 %}
+{% set memory_max = 68 %}
+{% set tasks_max = 1024 %}
+{% else %}
+{% set memory_high = 50 %}
+{% set memory_max = 75 %}
+{% set tasks_max = 2048 %}
+{% endif %}
+
+[Slice]
+MemoryHigh={{ memory_high }}%
+MemoryMax={{ memory_max }}%
+TasksMax={{ tasks_max }}

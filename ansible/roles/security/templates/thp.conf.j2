@@ -1,0 +1,37 @@
+{# THP khugepaged: scale with RAM #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+
+{# max_ptes_none: higher with more RAM for faster defragmentation #}
+{% if ram_mb <= 4096 %}
+{% set max_ptes_none = 128 %}
+{% elif ram_mb <= 8192 %}
+{% set max_ptes_none = 256 %}
+{% elif ram_mb <= 16384 %}
+{% set max_ptes_none = 512 %}
+{% else %}
+{% set max_ptes_none = 1024 %}
+{% endif %}
+
+{# sleep intervals: shorter on high-RAM (more aggressive defrag), longer on low-RAM (less pressure) #}
+{% if ram_mb <= 4096 %}
+{% set alloc_sleep = 15000 %}
+{% set scan_sleep = 15000 %}
+{% elif ram_mb <= 8192 %}
+{% set alloc_sleep = 12000 %}
+{% set scan_sleep = 12000 %}
+{% elif ram_mb <= 16384 %}
+{% set alloc_sleep = 10000 %}
+{% set scan_sleep = 10000 %}
+{% else %}
+{% set alloc_sleep = 5000 %}
+{% set scan_sleep = 5000 %}
+{% endif %}
+
+w /sys/kernel/mm/transparent_hugepage/enabled - - - - always
+w /sys/kernel/mm/transparent_hugepage/defrag - - - - never
+w /sys/kernel/mm/transparent_hugepage/khugepaged/defrag - - - - 0
+w /sys/kernel/mm/transparent_hugepage/khugepaged/alloc_sleep_millisecs - - - - {{ alloc_sleep }}
+w /sys/kernel/mm/transparent_hugepage/khugepaged/scan_sleep_millisecs - - - - {{ scan_sleep }}
+w /sys/kernel/mm/transparent_hugepage/khugepaged/max_ptes_none - - - - {{ max_ptes_none }}
+w /sys/kernel/mm/transparent_hugepage/shmem_enabled - - - - never
+w /sys/kernel/mm/transparent_hugepage/use_zero_page - - - - 0

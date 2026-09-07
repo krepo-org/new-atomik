@@ -5,7 +5,6 @@
     name: tuned
     state: started
     enabled: true
-  failed_when: false
 
 - name: Create tuned profile directory
   ansible.builtin.file:

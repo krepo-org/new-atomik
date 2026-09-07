@@ -132,7 +132,7 @@ jobs:
           import yaml
           with open('ansible/group_vars/all.yml') as f:
               cfg = yaml.safe_load(f)
-          for v in ['silverblue', 'kinoite', 'cosmic-atomic']:
+          for v in ['cosmic-atomic']:
               r = cfg.get('atomik_variant_remove', {}).get(v, [])
               i = cfg.get('atomik_variant_install', {}).get(v, [])
               assert isinstance(r, list), f'{v} remove not a list'
@@ -161,7 +161,7 @@ jobs:
           import yaml
           with open('ansible/group_vars/all.yml') as f:
               cfg = yaml.safe_load(f)
-          for v in ['silverblue', 'kinoite', 'cosmic-atomic']:
+          for v in ['cosmic-atomic']:
               services = cfg.get('atomik_desktop_scheduler_services', {}).get(v, [])
               print(f'{v}: scheduler services = {services}')
           "
@@ -172,7 +172,7 @@ jobs:
           import yaml
           with open('ansible/group_vars/all.yml') as f:
               cfg = yaml.safe_load(f)
-          for v in ['silverblue', 'kinoite', 'cosmic-atomic']:
+          for v in ['cosmic-atomic']:
               prot = cfg.get('atomik_oomd_protected_services', {}).get(v, [])
               assert len(prot) > 0, f'{v}: no OOMD protected services'
               print(f'{v}: {len(prot)} OOMD protected services')
@@ -197,7 +197,7 @@ jobs:
         run: |
           python3 -c "
           import os
-          extras = ['business', 'codium', 'devtools', 'gaming', 'gnome', 'packages', 'flatpak']
+          extras = ['business', 'vscode', 'devtools', 'gaming', 'packages', 'flatpak']
           errors = []
           for ext in extras:
               ext_dir = f'extra/{ext}'

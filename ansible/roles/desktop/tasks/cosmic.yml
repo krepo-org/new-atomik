@@ -1,0 +1,136 @@
+---
+
+- name: Check fish availability
+  ansible.builtin.command: which fish
+  register: fish_check
+  changed_when: false
+  failed_when: fish_check.rc != 0
+
+- name: Create COSMIC environment config directory
+  ansible.builtin.file:
+    path: "/home/{{ atomik_user }}/.config/environment.d"
+    state: directory
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0755"
+
+- name: Deploy COSMIC environment config
+  ansible.builtin.copy:
+    content: "{{ atomik_cosmic_environment }}"
+    dest: "/home/{{ atomik_user }}/.config/environment.d/atomik-cosmic.conf"
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0644"
+
+- name: Apply COSMIC desktop settings
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/desktop/tasks/cosmic/apply_cosmic_settings.fish {{ atomik_user }}"
+  changed_when: false
+  when: fish_check.rc == 0
+
+- name: Create systemd user directory
+  ansible.builtin.file:
+    path: "/home/{{ atomik_user }}/.config/systemd/user"
+    state: directory
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0755"
+
+- name: Enable xwayland-satellite so X11/XWayland apps have a display (COSMIC has no standalone X11 server)
+  ansible.builtin.systemd_service:
+    name: xwayland-satellite.service
+    scope: user
+    enabled: true
+    state: started
+  become: true
+  become_user: "{{ atomik_user }}"
+
+- name: Set amdgpu GPU to high performance on boot
+  ansible.builtin.copy:
+    content: |
+      #!/bin/sh
+      for card in /sys/class/drm/card*/device/power_dpm_force_performance_level; do
+        if test -f "$card"; then
+          echo "high" > "$card" 2>/dev/null || true
+        fi
+      done
+    dest: /usr/local/bin/amdgpu-performance.sh
+    owner: root
+    group: root
+    mode: "0755"
+  when: "'amdgpu' in atomik_gpu_drivers | default([])"
+  become: true
+
+- name: Enable amdgpu performance service
+  ansible.builtin.copy:
+    content: |
+      [Unit]
+      Description=Set amdgpu to high performance mode
+      After=multi-user.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/amdgpu-performance.sh
+
+      [Install]
+      WantedBy=multi-user.target
+    dest: /etc/systemd/system/amdgpu-performance.service
+    owner: root
+    group: root
+    mode: "0644"
+  when: "'amdgpu' in atomik_gpu_drivers | default([])"
+  become: true
+
+- name: Enable amdgpu-performance service
+  ansible.builtin.systemd:
+    name: amdgpu-performance.service
+    enabled: true
+    state: started
+  when: "'amdgpu' in atomik_gpu_drivers | default([])"
+  become: true
+
+- name: Enable xdg-desktop-portal
+  ansible.builtin.systemd_service:
+    name: xdg-desktop-portal.service
+    scope: user
+    enabled: true
+    state: started
+  become: true
+  become_user: "{{ atomik_user }}"
+
+- name: Enable xdg-desktop-portal-gtk for file chooser dialogs
+  ansible.builtin.systemd_service:
+    name: xdg-desktop-portal-gtk.service
+    scope: user
+    enabled: true
+    state: started
+  become: true
+  become_user: "{{ atomik_user }}"
+  ignore_unavailable: true
+
+- name: Ensure COSMIC comp has high priority
+  ansible.builtin.copy:
+    content: |
+      [Unit]
+      Description=COSMIC compositor priority boost
+      After=cosmic-comp.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/bin/bash -c 'sleep 2 && for pid in $(pgrep -x cosmic-comp); do renice -n -10 -p $pid 2>/dev/null; done'
+
+      [Install]
+      WantedBy=cosmic-session.target
+    dest: "/home/{{ atomik_user }}/.config/systemd/user/cosmic-comp-boost.service"
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0644"
+
+- name: Enable COSMIC comp boost service
+  ansible.builtin.systemd_service:
+    name: cosmic-comp-boost.service
+    scope: user
+    enabled: true
+    state: started
+  become: true
+  become_user: "{{ atomik_user }}"
+  ignore_unavailable: true

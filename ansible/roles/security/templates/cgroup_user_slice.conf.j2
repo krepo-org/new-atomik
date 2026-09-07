@@ -1,0 +1,22 @@
+{# Cgroup user slice: scale limits with RAM #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+
+{# On low-RAM: more conservative limits; on high-RAM: more generous #}
+{% if ram_mb <= 4096 %}
+{% set memory_high = 80 %}
+{% set memory_max = 90 %}
+{% set tasks_max = 2048 %}
+{% elif ram_mb <= 8192 %}
+{% set memory_high = 82 %}
+{% set memory_max = 92 %}
+{% set tasks_max = 4096 %}
+{% else %}
+{% set memory_high = 85 %}
+{% set memory_max = 95 %}
+{% set tasks_max = 8192 %}
+{% endif %}
+
+[Slice]
+MemoryHigh={{ memory_high }}%
+MemoryMax={{ memory_max }}%
+TasksMax={{ tasks_max }}

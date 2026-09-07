@@ -1,0 +1,21 @@
+{# OOMD config: scale pressure limits and duration with RAM #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+
+{% if ram_mb <= 4096 %}
+{% set swap_used_limit = 25 %}
+{% set memory_pressure_limit = 15 %}
+{% set pressure_duration = "2000ms" %}
+{% elif ram_mb <= 8192 %}
+{% set swap_used_limit = 30 %}
+{% set memory_pressure_limit = 18 %}
+{% set pressure_duration = "1750ms" %}
+{% else %}
+{% set swap_used_limit = 35 %}
+{% set memory_pressure_limit = 20 %}
+{% set pressure_duration = "1500ms" %}
+{% endif %}
+
+[OOM]
+SwapUsedLimit={{ swap_used_limit }}%
+DefaultMemoryPressureLimit={{ memory_pressure_limit }}%
+DefaultMemoryPressureDurationSec={{ pressure_duration }}

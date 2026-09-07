@@ -1,12 +1,34 @@
+{# Tuned profile: scale with hardware #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+{% set vcpus = ansible_facts['processor_vcpus'] | int %}
+
+{# min_perf_pct: lower on low-RAM systems to save power, higher on high-RAM #}
+{% if ram_mb <= 4096 %}
+{% set min_perf_pct = 30 %}
+{% elif ram_mb <= 8192 %}
+{% set min_perf_pct = 35 %}
+{% else %}
+{% set min_perf_pct = 40 %}
+{% endif %}
+
+{# nr_rqs: scale with CPU cores #}
+{% if vcpus <= 4 %}
+{% set nr_rqs = 512 %}
+{% elif vcpus <= 8 %}
+{% set nr_rqs = 1024 %}
+{% else %}
+{% set nr_rqs = 2048 %}
+{% endif %}
+
 [main]
 include=desktop
 
 [cpu]
-governor=performance
-energy_performance_preference=performance
+governor=balanced_performance
+energy_performance_preference=balance_performance
 boost=1
 max_perf_pct=100
-min_perf_pct=100
+min_perf_pct={{ min_perf_pct }}
 force_latency=1
 
 [kernel]
@@ -14,8 +36,8 @@ nmi_watchdog=0
 sched_autogroup=0
 
 [vm]
-transparent_hugepages=always
-transparent_hugepages_defrag=never
+transparent_hugepages=madvise
+transparent_hugepages_defrag=madvise
 
 [audio]
 timeout=0
@@ -24,11 +46,7 @@ alsa_period_size=128
 
 [scheduler]
 runtime=0
-nr_rqs=1024
-sched_migration_cost_ns=250000
-sched_min_granularity_ns=1500000
-sched_wakeup_granularity_ns=2000000
-perf_cpu_time_max_percent=0
+nr_rqs={{ nr_rqs }}
 
 [sysctl]
 kernel.timer_migration=0
@@ -37,10 +55,6 @@ vm.dirty_ratio=3
 vm.dirty_background_ratio=1
 vm.vfs_cache_pressure=100
 vm.swappiness=1
-kernel.sched_latency_ns=4000000
-kernel.sched_migration_cost_ns=250000
-kernel.sched_min_granularity_ns=1500000
-kernel.sched_wakeup_granularity_ns=2000000
 vm.compaction_proactiveness=0
 vm.page_lock_unfairness=1
 kernel.numa_balancing=0

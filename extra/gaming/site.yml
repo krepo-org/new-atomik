@@ -1,8 +1,17 @@
 ---
 - name: Setup gaming environment
   hosts: localhost
-  become: true
+  become: false
   gather_facts: true
+
+  pre_tasks:
+    - name: Detect real user
+      ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/shared/get_real_user.fish"
+      register: user_result
+      changed_when: false
+    - name: Set real user fact
+      ansible.builtin.set_fact:
+        ansible_user_id: "{{ user_result.stdout }}"
 
   vars:
     gaming_flatpaks:
@@ -12,15 +21,19 @@
     gaming_flatpak_overrides:
       com.discordapp.Discord:
         env:
-          ELECTRON_OZONE_PLATFORM_HINT: auto
-          XDG_CURRENT_DESKTOP: pop:GNOME
+          ELECTRON_OZONE_PLATFORM_HINT: x11
+        sockets:
+          - wayland
+          - x11
+        nosockets:
+          - fallback-x11
         filesystems:
           - xdg-cache:create
           - xdg-config:create
-        talk: true
       com.heroicgameslauncher.hgl:
         env:
           DXVK_HUD: 0
+          OZONE_PLATFORM_HINT: x11
         filesystems:
           - home:create
           - /run/media:create
@@ -28,15 +41,9 @@
 
   tasks:
     - name: Skip in containers
-      when: >
-        ansible_facts.get('virtualization_type', '') == 'container' or
-        ansible_facts.get('file', {}).get('/run/.toolboxenv', {}).get('exists', false)
-      block:
-        - name: Skip message
-          ansible.builtin.debug:
-            msg: "Skipping gaming setup in container environment"
-        - name: End play
-          ansible.builtin.meta: end_play
+      ansible.builtin.include_role:
+        name: shared
+        tasks_from: skip_in_containers.yml
 
     - name: Install gaming Flatpaks
       community.general.flatpak:
@@ -51,20 +58,33 @@
       become_user: "{{ ansible_user_id }}"
       register: flatpak_install
       changed_when: flatpak_install is changed
-      failed_when: false
+
+    - name: Reset gaming Flatpak overrides
+      ansible.builtin.shell: "flatpak override --user --reset {{ item }}"
+      loop: "{{ gaming_flatpaks }}"
+      loop_control:
+        label: "{{ item }}"
+      become: true
+      become_user: "{{ ansible_user_id }}"
+      register: gaming_reset_result
+      changed_when: gaming_reset_result.rc == 0
+      failed_when: gaming_reset_result.rc != 0
 
     - name: Apply gaming Flatpak overrides
       ansible.builtin.shell: |
         OVERRIDE_CMD="flatpak override --user"
-        {% for env_key, env_val in item.value.env | default({}) | dict2items %}
-        OVERRIDE_CMD="$OVERRIDE_CMD --env={{ env_key }}={{ env_val }}"
+        {% for s in item.value.sockets | default([]) %}
+        OVERRIDE_CMD="$OVERRIDE_CMD --socket={{ s }}"
+        {% endfor %}
+        {% for s in item.value.nosockets | default([]) %}
+        OVERRIDE_CMD="$OVERRIDE_CMD --nosocket={{ s }}"
+        {% endfor %}
+        {% for key, val in item.value.env.items() %}
+        OVERRIDE_CMD="$OVERRIDE_CMD --env={{ key }}={{ val }}"
         {% endfor %}
         {% for fs in item.value.filesystems | default([]) %}
         OVERRIDE_CMD="$OVERRIDE_CMD --filesystem={{ fs }}"
         {% endfor %}
-        {% if item.value.talk | default(false) %}
-        OVERRIDE_CMD="$OVERRIDE_CMD --talk"
-        {% endif %}
         $OVERRIDE_CMD {{ item.key }}
       loop: "{{ gaming_flatpak_overrides | dict2items }}"
       loop_control:
@@ -73,5 +93,5 @@
       become_user: "{{ ansible_user_id }}"
       register: override_result
       changed_when: override_result.rc == 0
-      failed_when: false
+      failed_when: override_result.rc != 0
       when: item.value is defined

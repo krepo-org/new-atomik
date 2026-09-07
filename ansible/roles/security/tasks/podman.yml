@@ -17,7 +17,7 @@
 
 - name: Deploy system containers.conf
   ansible.builtin.template:
-    src: containers-system.conf.j2
+    src: containers-system-dynamic.conf.j2
     dest: /etc/containers/containers.conf
     owner: root
     group: root
@@ -65,7 +65,7 @@
 
 - name: Deploy user containers.conf
   ansible.builtin.template:
-    src: containers-user.conf.j2
+    src: containers-user-dynamic.conf.j2
     dest: "{{ _podman_user_config }}/containers.conf"
     owner: "{{ atomik_user }}"
     group: "{{ atomik_user }}"
@@ -87,10 +87,22 @@
     group: "{{ atomik_user }}"
     mode: "0755"
 
-- name: Verify pasta fallback works
+- name: Ensure /run/media exists for removable media mounts
+  ansible.builtin.file:
+    path: /run/media
+    state: directory
+    mode: "0755"
+
+- name: Remove pasta package if present
+  ansible.builtin.command: rpm-ostree uninstall -y --apply-live --idempotent pasta
+  register: _pasta_remove
+  changed_when: "'Removed' in _pasta_remove.stdout or 'Queued' in _pasta_remove.stdout"
+  become: true
+
+- name: Verify slirp4netns networking works
   ansible.builtin.command: >
     podman run --rm --network=slirp4netns alpine:latest echo ok
   register: _podman_verify
   changed_when: false
   become: false
-  failed_when: false
+  failed_when: _podman_verify.rc != 0

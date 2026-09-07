@@ -27,15 +27,15 @@
         that:
           - business_check.stat.exists
 
-    - name: Verify codium module structure
+    - name: Verify vscode module structure
       ansible.builtin.stat:
-        path: "{{ project_root }}/extra/codium/site.yml"
-      register: codium_check
+        path: "{{ project_root }}/extra/vscode/site.yml"
+      register: vscode_check
 
-    - name: Assert codium module present
+    - name: Assert vscode module present
       ansible.builtin.assert:
         that:
-          - codium_check.stat.exists
+          - vscode_check.stat.exists
 
     - name: Verify packages module structure
       ansible.builtin.stat:

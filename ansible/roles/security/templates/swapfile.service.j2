@@ -1,0 +1,17 @@
+{# Swapfile size: min(RAM/2, 4G) in MB, minimum 512M #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+{% set swap_mb = [(ram_mb // 2), 512] | max %}
+{% set swap_mb = [swap_mb, 4096] | min %}
+{% set swap_gb = (swap_mb / 1024) | round(1) %}
+
+[Unit]
+Description=Atomik Swapfile Creator
+ConditionPathExists=!/var/swapfile
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/btrfs filesystem mkswapfile --size {{ swap_mb }}M /var/swapfile
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

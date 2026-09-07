@@ -1,0 +1,17 @@
+---
+- name: Create logind config directory
+  ansible.builtin.file:
+    path: /etc/systemd/logind.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy logind idle inhibit config
+  ansible.builtin.copy:
+    content: "{{ atomik_logind_conf }}"
+    dest: /etc/systemd/logind.conf.d/99-atomik.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart systemd-logind

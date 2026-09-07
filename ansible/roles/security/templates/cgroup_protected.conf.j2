@@ -1,0 +1,15 @@
+{# Protected service cgroup limits: scale TasksMax with RAM #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+
+{% if ram_mb <= 4096 %}
+{% set tasks_max = 2048 %}
+{% elif ram_mb <= 8192 %}
+{% set tasks_max = 4096 %}
+{% else %}
+{% set tasks_max = 8192 %}
+{% endif %}
+
+[Service]
+MemoryHigh=infinity
+MemoryMax=infinity
+TasksMax={{ tasks_max }}

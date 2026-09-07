@@ -1,5 +1,11 @@
 ---
 
+- name: Check fish availability
+  ansible.builtin.command: which fish
+  register: fish_check
+  changed_when: false
+  failed_when: fish_check.rc != 0
+
 - name: Set default shell to fish
   ansible.builtin.user:
     name: "{{ atomik_user }}"
@@ -36,3 +42,19 @@
     owner: "{{ atomik_user }}"
     group: "{{ atomik_user }}"
     mode: "0644"
+
+- name: Install oh-my-fish
+  ansible.builtin.shell: "test -d /var/home/{{ atomik_user }}/.local/share/omf || (curl -sL https://get.oh-my.fish -o /tmp/omf-install.fish && yes | fish /tmp/omf-install.fish)"
+  become: true
+  become_user: "{{ atomik_user }}"
+  changed_when: false
+  when: fish_check.rc == 0
+
+- name: Fix OMF key bindings recursion bug
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/site/fix_omf_key_bindings.fish"
+  become: true
+  become_user: "{{ atomik_user }}"
+  changed_when: false
+  when: fish_check.rc == 0
+
+

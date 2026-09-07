@@ -1,0 +1,9 @@
+---
+- name: Deploy DPMS disable udev rules
+  ansible.builtin.copy:
+    content: "{{ atomik_dpms_udev_rules }}"
+    dest: /etc/udev/rules.d/99-atomik-dpms.rules
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload udev

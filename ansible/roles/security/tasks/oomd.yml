@@ -6,7 +6,6 @@
     state: started
     enabled: true
     masked: false
-  failed_when: false
 
 - name: Create OOMD config directory
   ansible.builtin.file:
@@ -47,8 +46,8 @@
     label: "{{ item }}"
 
 - name: Deploy OOMD config
-  ansible.builtin.copy:
-    content: "{{ atomik_oomd_config }}"
+  ansible.builtin.template:
+    src: oomd.conf.j2
     dest: /etc/systemd/oomd.conf.d/99-atomik.conf
     owner: root
     group: root
@@ -56,8 +55,8 @@
   notify: Reload systemd
 
 - name: Deploy OOMD user slice config
-  ansible.builtin.copy:
-    content: "{{ atomik_oomd_user_slice }}"
+  ansible.builtin.template:
+    src: oomd_user_slice.conf.j2
     dest: /etc/systemd/system/user-.slice.d/99-atomik-oomd.conf
     owner: root
     group: root
@@ -65,8 +64,8 @@
   notify: Reload systemd
 
 - name: Deploy user slice memory limits
-  ansible.builtin.copy:
-    content: "{{ atomik_cgroup_user_slice }}"
+  ansible.builtin.template:
+    src: cgroup_user_slice.conf.j2
     dest: /etc/systemd/system/user-.slice.d/99-atomik-memory.conf
     owner: root
     group: root
@@ -75,7 +74,7 @@
 
 - name: Create OOMD protected service dropins
   ansible.builtin.template:
-    src: oomd_protected.service.d.j2
+    src: oomd_protected.conf.j2
     dest: "/etc/systemd/system/{{ item }}.service.d/99-atomik-oomd.conf"
     owner: root
     group: root
@@ -86,8 +85,8 @@
   notify: Reload systemd
 
 - name: Deploy protected service cgroup limits
-  ansible.builtin.copy:
-    content: "{{ atomik_cgroup_protected_default }}"
+  ansible.builtin.template:
+    src: cgroup_protected.conf.j2
     dest: "/etc/systemd/system/{{ item }}.service.d/99-atomik-cgroup.conf"
     owner: root
     group: root

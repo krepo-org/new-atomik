@@ -1,0 +1,10 @@
+# Atomik dynamic GPU kernel module parameters
+{% if 'i915' in atomik_gpu_drivers | default([atomik_gpu_module]) %}
+options i915 enable_psr=0 enable_fbc=1
+{% endif %}
+{% if 'xe' in atomik_gpu_drivers | default([atomik_gpu_module]) %}
+options xe enable_psr=0
+{% endif %}
+{% if 'nvidia' in atomik_gpu_drivers | default([atomik_gpu_module]) %}
+options nvidia-drm modeset=1 fbdev=1
+{% endif %}

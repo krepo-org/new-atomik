@@ -1,0 +1,16 @@
+{# Protected service OOMD: scale with RAM #}
+{% set ram_mb = ansible_facts['memtotal_mb'] | int %}
+
+{% if ram_mb <= 4096 %}
+{% set memory_pressure_limit = 40 %}
+{% elif ram_mb <= 8192 %}
+{% set memory_pressure_limit = 45 %}
+{% else %}
+{% set memory_pressure_limit = 50 %}
+{% endif %}
+
+[Service]
+ManagedOOMMemoryPressure=kill
+ManagedOOMMemoryPressureLimit={{ memory_pressure_limit }}%
+ManagedOOMSwap=kill
+OOMScoreAdjust=-1000

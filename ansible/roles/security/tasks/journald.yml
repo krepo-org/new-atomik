@@ -8,19 +8,8 @@
     mode: "0755"
 
 - name: Deploy systemd-journald latency tuning
-  ansible.builtin.copy:
-    content: |
-      [Journal]
-      RateLimitIntervalSec=0
-      RateLimitBurst=0
-      Compress=yes
-      SyncIntervalSec=5m
-      SystemMaxUse=500M
-      RuntimeMaxUse=100M
-      MaxRetentionSec=7day
-      MaxFileSec=1day
-      ForwardToSyslog=no
-      ForwardToWall=no
+  ansible.builtin.template:
+    src: journald.conf.j2
     dest: /etc/systemd/journald.conf.d/99-atomik.conf
     owner: root
     group: root

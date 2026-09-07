@@ -1,0 +1,31 @@
+---
+- name: Ensure pcscd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/pcscd.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy pcscd override to keep service running
+  ansible.builtin.copy:
+    content: |
+      [Service]
+      ExecStart=
+      ExecStart=/usr/bin/pcscd --foreground
+    dest: /etc/systemd/system/pcscd.service.d/override.conf
+    owner: root
+    group: root
+    mode: "0644"
+  register: _pcscd_override
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: _pcscd_override.changed
+
+- name: Restart pcscd service
+  ansible.builtin.systemd:
+    name: pcscd.service
+    state: restarted
+  when: _pcscd_override.changed

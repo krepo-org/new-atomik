@@ -4,13 +4,10 @@
     name: firewalld
     state: started
     enabled: true
-  failed_when: false
 
 - name: Add firewall services
-  ansible.builtin.shell: |
-    firewall-cmd --permanent --add-service {{ item }}
-    firewall-cmd --reload
+  ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/ansible/roles/security/tasks/firewall/add_firewall_service.fish {{ item }}"
   loop: "{{ atomik_firewall_services }}"
   register: firewall_result
   changed_when: firewall_result.rc == 0
-  failed_when: false
+  failed_when: firewall_result.rc != 0

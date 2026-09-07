@@ -1,48 +1,11 @@
 ---
 - name: Configure Fedora Atomic system
   hosts: localhost
-  become: true
   gather_facts: true
 
   pre_tasks:
-    - name: Detect OS variant
-      ansible.builtin.shell: |
-        refspec=$(rpm-ostree status 2>/dev/null | head -20 | grep -oP 'fedora:[^ ]+' | head -1 || echo "")
-        if echo "$refspec" | grep -q "silverblue"; then
-          echo "silverblue"
-        elif echo "$refspec" | grep -q "kinoite"; then
-          echo "kinoite"
-        elif echo "$refspec" | grep -q "cosmic-atomic"; then
-          echo "cosmic-atomic"
-        else
-          echo "silverblue"
-        fi
-      register: variant_result
-      changed_when: false
-      tags: [always]
-
-    - name: Set variant fact
-      ansible.builtin.set_fact:
-        atomik_variant: "{{ variant_result.stdout }}"
-      tags: [always]
-
-    - name: Detect desktop environment
-      ansible.builtin.set_fact:
-        atomik_desktop: >-
-          {%- if atomik_variant == 'kinoite' -%}kde
-          {%- elif atomik_variant == 'cosmic-atomic' -%}cosmic
-          {%- else -%}gnome{%- endif -%}
-      tags: [always]
-
-    - name: Get real user
-      ansible.builtin.shell: |
-        if [ -n "$SUDO_USER" ]; then
-          echo "$SUDO_USER"
-        elif [ -n "$PKEXEC_UID" ]; then
-          getent passwd "$PKEXEC_UID" | cut -d: -f1
-        else
-          echo "$USER"
-        fi
+    - name: Detect real user
+      ansible.builtin.shell: "fish {{ inventory_dir }}/../../scripts/shared/get_real_user.fish"
       register: user_result
       changed_when: false
       tags: [always]
@@ -52,17 +15,23 @@
         atomik_user: "{{ user_result.stdout }}"
       tags: [always]
 
-    - name: Display variant info
+    - name: Display info
       ansible.builtin.debug:
-        msg: "Variant: {{ atomik_variant }}, Desktop: {{ atomik_desktop }}, User: {{ atomik_user }}"
+        msg: "Desktop: COSMIC, User: {{ atomik_user }}"
       tags: [always]
 
   roles:
+    - role: bootstrap
+      become: true
+      tags: [bootstrap]
     - role: repos
+      become: true
       tags: [repos]
     - role: packages
+      become: true
       tags: [packages]
     - role: security
+      become: true
       tags: [security]
     - role: desktop
-      tags: [desktop, gnome, kde]
+      tags: [desktop]

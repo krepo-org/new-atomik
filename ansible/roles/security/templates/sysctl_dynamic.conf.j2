@@ -1,14 +1,87 @@
 {% set total_ram_kb = ansible_facts["memtotal_mb"] * 1024 %}
-{% set total_ram_gb = ansible_facts["memtotal_mb"] / 1024 %}
+{% set total_ram_gb = (ansible_facts["memtotal_mb"] / 1024) | round(2) %}
+{% set vcpus = ansible_facts['processor_vcpus'] | int %}
+
+{# --- VM memory reserves: scale with RAM --- #}
 {% set min_free = [((total_ram_kb * 3 / 100) | int), 131072] | max %}
 {% set min_free = [min_free, 524288] | min %}
 {% set admin_reserve = [((total_ram_kb * 1 / 100) | int), 8192] | max %}
 {% set admin_reserve = [admin_reserve, 65536] | min %}
-{% set watermark_scale = 200 %}
 {% set user_reserve = [((total_ram_kb * 1 / 100) | int), 8192] | max %}
 {% set user_reserve = [user_reserve, 65536] | min %}
+{% set watermark_scale = [((total_ram_gb * 10) | int), 100] | max %}
+{% set watermark_scale = [watermark_scale, 300] | min %}
+
+{# --- inotify watches: scale with RAM --- #}
+{% if ansible_facts['memtotal_mb'] <= 4096 %}
+{% set max_user_watches = 131072 %}
+{% elif ansible_facts['memtotal_mb'] <= 8192 %}
+{% set max_user_watches = 524288 %}
+{% else %}
+{% set max_user_watches = 1048576 %}
+{% endif %}
+
+{# --- pid_max: scale with CPU cores --- #}
+{% if vcpus <= 4 %}
+{% set pid_max = 32768 %}
+{% elif vcpus <= 8 %}
+{% set pid_max = 131072 %}
+{% elif vcpus <= 16 %}
+{% set pid_max = 524288 %}
+{% else %}
+{% set pid_max = 4194304 %}
+{% endif %}
+
+{# --- threads-max: scale with CPU cores * RAM --- #}
+{% set threads_max = [vcpus * 4096, 65536] | max %}
+{% set threads_max = [threads_max, 1048576] | min %}
+
+{# --- max_map_count: scale with RAM --- #}
+{% if ansible_facts['memtotal_mb'] <= 4096 %}
+{% set max_map_count = 1048576 %}
+{% elif ansible_facts['memtotal_mb'] <= 8192 %}
+{% set max_map_count = 2097152 %}
+{% else %}
+{% set max_map_count = 2147483642 %}
+{% endif %}
+
+{# --- overcommit_ratio: scale with RAM --- #}
+{% if ansible_facts['memtotal_mb'] <= 4096 %}
+{% set overcommit_ratio = 50 %}
+{% elif ansible_facts['memtotal_mb'] <= 8192 %}
+{% set overcommit_ratio = 60 %}
+{% else %}
+{% set overcommit_ratio = 80 %}
+{% endif %}
+
+{# --- tcp_notsent_lowat: scale with RAM --- #}
+{% if ansible_facts['memtotal_mb'] <= 4096 %}
+{% set tcp_notsent_lowat = 32768 %}
+{% elif ansible_facts['memtotal_mb'] <= 8192 %}
+{% set tcp_notsent_lowat = 131072 %}
+{% else %}
+{% set tcp_notsent_lowat = 262144 %}
+{% endif %}
+
+{# --- Scheduler parameters: scale with CPU count --- #}
+{% set sched_factor = [vcpus // 4, 1] | max %}
+{% set sched_latency_ns = [6000000, 2000000 * sched_factor] | min %}
+{% set sched_migration_cost_ns = [500000, 100000 * sched_factor] | min %}
+{% set sched_min_granularity_ns = [3000000, 1000000 * sched_factor] | min %}
+{% set sched_wakeup_granularity_ns = [4000000, 1500000 * sched_factor] | min %}
 
 vm.min_free_kbytes={{ min_free }}
 vm.admin_reserve_kbytes={{ admin_reserve }}
 vm.user_reserve_kbytes={{ user_reserve }}
 vm.watermark_scale_factor={{ watermark_scale }}
+vm.max_map_count={{ max_map_count }}
+vm.overcommit_ratio={{ overcommit_ratio }}
+kernel.pid_max={{ pid_max }}
+kernel.threads-max={{ threads_max }}
+kernel.sched_latency_ns={{ sched_latency_ns }}
+kernel.sched_migration_cost_ns={{ sched_migration_cost_ns }}
+kernel.sched_min_granularity_ns={{ sched_min_granularity_ns }}
+kernel.sched_wakeup_granularity_ns={{ sched_wakeup_granularity_ns }}
+kernel.perf_cpu_time_max_percent=1
+fs.inotify.max_user_watches={{ max_user_watches }}
+net.ipv4.tcp_notsent_lowat={{ tcp_notsent_lowat }}

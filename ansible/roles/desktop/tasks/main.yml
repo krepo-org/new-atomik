@@ -1,10 +1,58 @@
 ---
 
-- name: Apply GNOME desktop settings
-  ansible.builtin.include_tasks: gnome.yml
-  when: atomik_desktop == 'gnome'
+- name: Ensure fontconfig directory exists
+  ansible.builtin.file:
+    path: "~/.config/fontconfig"
+    state: directory
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0755"
+  become: true
+  become_user: "{{ atomik_user }}"
+  tags: [fonts]
 
-- name: Apply KDE desktop settings
-  ansible.builtin.include_tasks: kde.yml
-  when: atomik_desktop == 'kde'
+- name: Deploy emoji font fallback configuration
+  ansible.builtin.copy:
+    content: |
+      <?xml version="1.0"?>
+      <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+      <fontconfig>
+        <match target="scan">
+          <test name="family"><string>Noto Color Emoji</string></test>
+          <edit name="scalable" mode="assign"><bool>true</bool></edit>
+        </match>
+        <alias binding="weak">
+          <family>emoji</family>
+          <prefer><family>Noto Color Emoji</family></prefer>
+        </alias>
+        <match>
+          <test name="family" compare="not_eq"><string>Noto Color Emoji</string></test>
+          <edit name="family" mode="append" binding="weak"><string>Noto Color Emoji</string></edit>
+        </match>
+      </fontconfig>
+    dest: "~/.config/fontconfig/99-atomik-emoji.conf"
+    owner: "{{ atomik_user }}"
+    group: "{{ atomik_user }}"
+    mode: "0644"
+  become: true
+  become_user: "{{ atomik_user }}"
+  tags: [fonts]
 
+- name: Rebuild font cache
+  ansible.builtin.shell: fc-cache -f
+  become: true
+  become_user: "{{ atomik_user }}"
+  changed_when: false
+  tags: [fonts]
+
+
+- name: Apply COSMIC desktop settings
+  ansible.builtin.include_tasks: cosmic.yml
+  when: atomik_desktop == 'cosmic'
+  tags: [cosmic, desktop]
+
+
+- name: Set Brave Origin as default web browser
+  ansible.builtin.shell: "xdg-settings set default-web-browser brave-origin.desktop"
+  changed_when: false
+  tags: [desktop, cosmic]
