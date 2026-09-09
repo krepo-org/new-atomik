@@ -105,7 +105,7 @@
     state: started
   become: true
   become_user: "{{ atomik_user }}"
-  ignore_unavailable: true
+  ignore_errors: true
 
 - name: Ensure COSMIC comp has high priority
   ansible.builtin.copy:
@@ -133,4 +133,4 @@
     state: started
   become: true
   become_user: "{{ atomik_user }}"
-  ignore_unavailable: true
+  ignore_errors: true

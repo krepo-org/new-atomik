@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+FONTS_LINK="$HOME/.local/share/flatpak-fonts"
+mkdir -p "$FONTS_LINK"
+for d in /usr/share/fonts/* /usr/local/share/fonts/*; do
+  [ -d "$d" ] && ln -sfn "$d" "$FONTS_LINK/" 2>/dev/null || true
+done
+
 OVERRIDES=(
   --nosocket=fallback-x11
   --socket=wayland
@@ -8,6 +14,8 @@ OVERRIDES=(
   --env=ELECTRON_OZONE_PLATFORM_HINT=wayland
   --filesystem=xdg-cache:create
   --filesystem=xdg-config:create
+  --filesystem=xdg-data/flatpak-fonts:ro
+  --filesystem=xdg-data/fontconfig:ro
 )
 
 # Controlla se siamo dentro Toolbx/Container

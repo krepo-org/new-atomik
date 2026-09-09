@@ -4,7 +4,7 @@ Every configuration applied by Atomik must survive a reboot. No temporary workar
 
 ## Electron Flatpak Override Agent
 
-The fix-electron-overrides script runs via a systemd path unit that monitors /var/lib/flatpak/app/ for changes. Every time a Flatpak app is installed or updated, the path unit triggers the service which detects all apps using the Electron base app and applies the correct sandbox overrides. A timer also runs 30 seconds after boot to ensure overrides are applied. The overrides remove fallback-x11, enable wayland and x11 sockets, and set ELECTRON_OZONE_PLATFORM_HINT=x11.
+The fix-electron-overrides script runs via a systemd path unit that monitors /var/lib/flatpak/app/ for changes. Every time a Flatpak app is installed or updated, the path unit triggers the service which detects all apps using the Electron base app and applies the correct sandbox overrides. A timer also runs 30 seconds after boot to ensure overrides are applied. The overrides remove fallback-x11, enable wayland and x11 sockets, set ELECTRON_OZONE_PLATFORM_HINT=wayland, and expose host fonts via a symlinked directory at ~/.local/share/flatpak-fonts/ (Flatpak blocks /usr in overrides). The fix-electron-host script must use flatpak directly — flatpak-spawn is for escaping Flatpak sandboxes, not for running on the host. Font emoji (Noto Color Emoji) require the symlink trick because host-fonts is not supported in flatpak override --filesystem.
 
 ## Battery Charge Threshold
 
@@ -17,3 +17,7 @@ The cosmic-comp-boost systemd user service sets the COSMIC compositor process to
 ## AMDGPU Performance Service
 
 The amdgpu-performance systemd system service runs once at boot and sets power_dpm_force_performance_level to high for all AMDGPU cards. This prevents the GPU from entering lower power states that cause frame drops and stuttering in the compositor.
+
+## flatpak-spawn vs flatpak
+
+flatpak-spawn is a tool designed to escape Flatpak sandbox contexts — it forwards commands to the host D-Bus from inside a sandbox. It must never be used to run commands directly on the host. Systemd user services run on the host natively and should use flatpak (or any other binary) directly. Using flatpak-spawn from a systemd service on the host causes exit code 127 (command not found) because the D-Bus session helper is not available outside a sandbox. The fix-electron-overrides-host script (deployed to ~/.local/bin/) runs on the host via systemd and must call flatpak directly, never flatpak-spawn.

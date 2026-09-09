@@ -19,9 +19,9 @@ end
 
 for v in (string match -r 'v[0-9]+' $idle_versions | sort -u)
     mkdir -p $target_home/.config/cosmic/com.system76.CosmicIdle/$v
-    echo "None" > $target_home/.config/cosmic/com.system76.CosmicIdle/$v/screen_off_time
-    echo "None" > $target_home/.config/cosmic/com.system76.CosmicIdle/$v/suspend_on_ac_time
-    echo "None" > $target_home/.config/cosmic/com.system76.CosmicIdle/$v/suspend_on_battery_time
+    echo "Some(900000)" > $target_home/.config/cosmic/com.system76.CosmicIdle/$v/screen_off_time
+    echo "Some(1800000)" > $target_home/.config/cosmic/com.system76.CosmicIdle/$v/suspend_on_ac_time
+    echo "Some(1800000)" > $target_home/.config/cosmic/com.system76.CosmicIdle/$v/suspend_on_battery_time
 end
 
 # Dynamically discover all CosmicSettings.Shortcuts versions and ensure custom shortcuts exist

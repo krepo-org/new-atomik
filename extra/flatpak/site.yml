@@ -91,14 +91,21 @@
 
     - name: Apply base Electron override to all detected apps
       ansible.builtin.shell: |
+        FONTS_LINK="$HOME/.local/share/flatpak-fonts"
+        mkdir -p "$FONTS_LINK"
+        for d in /usr/share/fonts/* /usr/local/share/fonts/*; do
+          [ -d "$d" ] && ln -sfn "$d" "$FONTS_LINK/" 2>/dev/null || true
+        done
         flatpak override --user --reset {{ item }}
         flatpak override --user \
           --nosocket=fallback-x11 \
           --socket=wayland \
           --socket=x11 \
-          --env=ELECTRON_OZONE_PLATFORM_HINT=x11 \
+          --env=ELECTRON_OZONE_PLATFORM_HINT=wayland \
           --filesystem=xdg-cache:create \
           --filesystem=xdg-config:create \
+          --filesystem=xdg-data/flatpak-fonts:ro \
+          --filesystem=xdg-data/fontconfig:ro \
           {{ item }}
       loop: "{{ detected_electron_apps }}"
       loop_control:
@@ -239,6 +246,85 @@
 
     - name: Run fix-electron-overrides now
       ansible.builtin.command: "{{ ansible_user_id == 'root' | ternary('/root', '/home/' + ansible_user_id) }}/.local/bin/fix-electron-overrides"
+      become: true
+      become_user: "{{ ansible_user_id }}"
+      changed_when: false
+
+    - name: Deploy Electron app config persistence script
+      ansible.builtin.copy:
+        content: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          USER_HOME="/var/home/{{ ansible_user_id }}"
+
+          # Re-apply Discord flags file
+          mkdir -p "$USER_HOME/.var/app/com.discordapp.Discord/config/discord"
+          cat > "$USER_HOME/.var/app/com.discordapp.Discord/config/discord-flags.conf" << 'FLAGS'
+          --ozone-platform=wayland
+          FLAGS
+          chown -R {{ ansible_user_id }}:{{ ansible_user_id }} "$USER_HOME/.var/app/com.discordapp.Discord/config"
+
+          # Re-apply Discord hardware acceleration
+          SETTINGS="$USER_HOME/.var/app/com.discordapp.Discord/config/discord/settings.json"
+          if [ -f "$SETTINGS" ]; then
+            if grep -q '"enableHardwareAcceleration"\s*:\s*false' "$SETTINGS"; then
+              sed -i 's/"enableHardwareAcceleration"\s*:\s*false/"enableHardwareAcceleration": true/' "$SETTINGS"
+            fi
+          fi
+        dest: "~/.local/bin/fix-electron-app-configs"
+        owner: "{{ ansible_user_id }}"
+        mode: "0755"
+      become: true
+      become_user: "{{ ansible_user_id }}"
+
+    - name: Deploy Electron app config persistence service
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          Description=Re-apply Electron app configs after boot
+          After=fix-electron-flatpak.service
+
+          [Service]
+          Type=oneshot
+          ExecStart=%h/.local/bin/fix-electron-app-configs
+
+          [Install]
+          WantedBy=default.target
+        dest: "~/.config/systemd/user/fix-electron-app-configs.service"
+        owner: "{{ ansible_user_id }}"
+        mode: "0644"
+      become: true
+      become_user: "{{ ansible_user_id }}"
+
+    - name: Deploy Electron app config persistence timer
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          Description=Re-apply Electron app configs after boot
+
+          [Timer]
+          OnBootSec=35s
+
+          [Install]
+          WantedBy=timers.target
+        dest: "~/.config/systemd/user/fix-electron-app-configs.timer"
+        owner: "{{ ansible_user_id }}"
+        mode: "0644"
+      become: true
+      become_user: "{{ ansible_user_id }}"
+
+    - name: Enable Electron app config persistence timer
+      ansible.builtin.systemd_service:
+        name: fix-electron-app-configs.timer
+        scope: user
+        enabled: true
+        state: started
+      become: true
+      become_user: "{{ ansible_user_id }}"
+
+    - name: Run Electron app config persistence now
+      ansible.builtin.command: "{{ ansible_user_id == 'root' | ternary('/root', '/home/' + ansible_user_id) }}/.local/bin/fix-electron-app-configs"
       become: true
       become_user: "{{ ansible_user_id }}"
       changed_when: false

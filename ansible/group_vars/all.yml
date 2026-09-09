@@ -428,16 +428,17 @@ atomik_alsa_power_save: |
 
 atomik_logind_conf: |
   [Login]
-  IdleAction=ignore
-  IdleActionSec=infinity
+  IdleAction=suspend
+  IdleActionSec=30min
   HandleSuspendKey=ignore
   HandleHibernateKey=ignore
-  HandleLidSwitch=ignore
-  HandleLidSwitchExternalPower=ignore
+  HandleLidSwitch=suspend
+  HandleLidSwitchExternalPower=suspend
   HandleLidSwitchDocked=ignore
   PowerKeyIgnoreInhibited=yes
   SuspendKeyIgnoreInhibited=yes
   HibernateKeyIgnoreInhibited=yes
+  CriticalBatteryAction=suspend
 
 atomik_dpms_udev_rules: |
   ACTION=="add", SUBSYSTEM=="drm", KERNEL=="card*", RUN+="/usr/bin/xset -dpms 2>/dev/null || true"
@@ -457,7 +458,7 @@ atomik_wifi_restart_service: |
   [Install]
   WantedBy=multi-user.target
 
-atomik_battery_charge_threshold: 85
+atomik_battery_charge_threshold: 75
 
 atomik_battery_threshold_script: |
   #!/bin/bash
@@ -477,6 +478,39 @@ atomik_battery_threshold_service: |
 
   [Install]
   WantedBy=multi-user.target
+
+atomik_battery_monitor_script: |
+  #!/bin/bash
+  CRITICAL_LEVEL=10
+  for bat in /sys/class/power_supply/BAT*/capacity; do
+    [ -f "$bat" ] || continue
+    capacity=$(cat "$bat")
+    if [ "$capacity" -le "$CRITICAL_LEVEL" ]; then
+      logger -t battery-monitor "Battery at ${capacity}%, suspending"
+      systemctl suspend
+      exit 0
+    fi
+  done
+
+atomik_battery_monitor_service: |
+  [Unit]
+  Description=Suspend at critical battery level
+  After=multi-user.target
+
+  [Service]
+  Type=oneshot
+  ExecStart=/usr/local/bin/atomik-battery-monitor.sh
+
+atomik_battery_monitor_timer: |
+  [Unit]
+  Description=Check battery level every 5 minutes
+
+  [Timer]
+  OnBootSec=5min
+  OnUnitActiveSec=5min
+
+  [Install]
+  WantedBy=timers.target
 
 atomik_cosmic_environment: |
   DISPLAY=:0

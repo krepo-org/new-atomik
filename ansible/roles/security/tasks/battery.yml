@@ -25,3 +25,36 @@
 - name: Apply battery charge threshold now
   ansible.builtin.command: /usr/local/bin/atomik-battery-threshold.sh
   changed_when: false
+
+- name: Deploy battery monitor script
+  ansible.builtin.copy:
+    content: "{{ atomik_battery_monitor_script }}"
+    dest: /usr/local/bin/atomik-battery-monitor.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy battery monitor service
+  ansible.builtin.copy:
+    content: "{{ atomik_battery_monitor_service }}"
+    dest: /etc/systemd/system/atomik-battery-monitor.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Deploy battery monitor timer
+  ansible.builtin.copy:
+    content: "{{ atomik_battery_monitor_timer }}"
+    dest: /etc/systemd/system/atomik-battery-monitor.timer
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Enable and start battery monitor timer
+  ansible.builtin.systemd:
+    name: atomik-battery-monitor.timer
+    enabled: true
+    state: started
+    daemon_reload: true

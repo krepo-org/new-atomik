@@ -1,11 +1,19 @@
 ---
 
+- name: Check if legacy swapfile service exists
+  ansible.builtin.find:
+    paths: /etc/systemd/system
+    patterns: "bora-swapfile.service"
+    file_type: file
+  register: legacy_swapfile_service
+
 - name: Stop and disable legacy swapfile service
   ansible.builtin.systemd:
     name: bora-swapfile.service
     state: stopped
     enabled: false
     masked: true
+  when: legacy_swapfile_service.files | length > 0
 
 - name: Remove legacy swapfile service files
   ansible.builtin.file:
